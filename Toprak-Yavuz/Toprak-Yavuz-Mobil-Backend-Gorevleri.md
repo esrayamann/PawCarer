@@ -1,5 +1,5 @@
 # Ali Tutar'ın Mobil Backend Görevleri
-**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek](https://example.com)
+**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek]()
 
 ## 1. Üye Olma (Kayıt) Servisi
 - **API Endpoint:** `POST /auth/register`
