@@ -23,5 +23,5 @@
 
 # Gereksinim Dağılımları
 
-1. [Toprak Yavuz'un Gereksinimleri]()
+1. [Toprak Yavuz'un Gereksinimleri](Toprak-Yavuz/Toprak-Yavuz-Gereksinimler.md)
 2. [Grup Üyesi 2'nin Gereksinimleri](Grup-Uyesi-2/Grup-Uyesi-2-Gereksinimler.md)
