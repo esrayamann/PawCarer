@@ -1,5 +1,5 @@
 # PawCarer API Tasarımı
-
+**OpenAPI Spesifikasyon Dosyası:** [lamine.yaml](lamine.yaml)
 Bu doküman, OpenAPI Specification (OAS) 3.0 standardına göre hazırlanmış, PawCarer mobil ve web uygulamasının gereksinimlerine göre (Gereksinim-Analizi.md) tasarlanan RESTful API uç noktalarını içermektedir.
 
 ## OpenAPI Specification
