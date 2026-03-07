@@ -1,57 +1,58 @@
-# API Tasarımı - OpenAPI Specification Örneği
+# PawCarer API Tasarımı
 
-**OpenAPI Spesifikasyon Dosyası:** [lamine.yaml](lamine.yaml)
-
-Bu doküman, OpenAPI Specification (OAS) 3.0 standardına göre hazırlanmış örnek bir API tasarımını içermektedir.
+Bu doküman, OpenAPI Specification (OAS) 3.0 standardına göre hazırlanmış, PawCarer mobil ve web uygulamasının gereksinimlerine göre (Gereksinim-Analizi.md) tasarlanan RESTful API uç noktalarını içermektedir.
 
 ## OpenAPI Specification
 
 ```yaml
 openapi: 3.0.3
 info:
-  title: E-Ticaret API
+  title: PawCarer API
   description: |
-    E-ticaret platformu için RESTful API.
+    PawCarer uygulaması için RESTful API tasarımı.
+    Hem web hem de mobil platformlar için kullanılabilir.
     
     ## Özellikler
-    - Kullanıcı yönetimi
-    - Ürün katalog yönetimi
-    - Sipariş işlemleri
-    - JWT tabanlı kimlik doğrulama
+    1. Hayvan sahibi veya Bakıcı olarak kayıt olma (Req 1, 2)
+    2. Giriş yapma (Req 3)
+    3. Kullanıcı ve bakıcı hesap bilgilerini güncelleme (Req 7, 8)
+    4. Evcil hayvan profili oluşturma (Req 9)
+    5. Konum, tür ve cinse göre bakıcı arama ve filtreleme (Req 10, 11, 12)
+    6. Bakıcılara yorum yapma, yorumlarda ortalama yıldız hesabı listeleme (Req 4, 6)
+    7. Kendi yaptığı yorumu güncelleme (Req 16)
+    8. Yönetici işlemleri (Kullanıcı, bakıcı, yorum silme ve rol atama) (Req 5, 13, 14, 15)
   version: 1.0.0
   contact:
-    name: API Destek Ekibi
-    email: api-support@yazmuh.com
-    url: https://api.yazmuh.com/support
-  license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
+    name: PawCarer Destek Ekibi
+    email: support@pawcarer.com
 
 servers:
-  - url: https://api.yazmuh.com/v1
+  - url: https://api.pawcarer.com/v1
     description: Production server
-  - url: https://staging-api.yazmuh.com/v1
-    description: Staging server
   - url: http://localhost:3000/v1
     description: Development server
 
 tags:
-  - name: users
-    description: Kullanıcı yönetimi işlemleri
-  - name: products
-    description: Ürün katalog işlemleri
-  - name: orders
-    description: Sipariş işlemleri
   - name: auth
-    description: Kimlik doğrulama işlemleri
+    description: Kimlik doğrulama ve kayıt işlemleri
+  - name: users
+    description: Kullanıcı profili işlemleri
+  - name: sitters
+    description: Bakıcı arama ve profili işlemleri
+  - name: pets
+    description: Evcil hayvan işlemleri
+  - name: reviews
+    description: Yorum işlemleri
+  - name: admin
+    description: Yönetici işlemleri
 
 paths:
   /auth/register:
     post:
       tags:
         - auth
-      summary: Yeni kullanıcı kaydı
-      description: Sisteme yeni bir kullanıcı kaydeder
+      summary: Kullanıcı veya bakıcı kaydı
+      description: Hayvan sahibi veya bakıcı olarak sisteme kayıt olma işlemi. (Req 1, 2)
       operationId: registerUser
       requestBody:
         required: true
@@ -59,36 +60,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UserRegistration'
-            examples:
-              example1:
-                summary: Örnek kullanıcı kaydı
-                value:
-                  email: kullanici@example.com
-                  password: Guvenli123!
-                  firstName: Ahmet
-                  lastName: Yılmaz
       responses:
         '201':
-          description: Kullanıcı başarıyla oluşturuldu
+          description: Kayıt başarılı
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserResponse'
         '400':
-          $ref: '#/components/responses/BadRequest'
-        '409':
-          description: Email adresi zaten kullanımda
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Geçersiz veri (Geçersiz formatta veri veya sistemde zaten var)
 
   /auth/login:
     post:
       tags:
         - auth
       summary: Kullanıcı girişi
-      description: Email ve şifre ile giriş yapar, JWT token döner
+      description: Email ve şifre ile sisteme giriş yapar. JWT token döner. (Req 3)
       operationId: loginUser
       requestBody:
         required: true
@@ -102,73 +89,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthToken'
+                $ref: '#/components/schemas/AuthResponse'
         '401':
-          $ref: '#/components/responses/Unauthorized'
-
-  /users:
-    get:
-      tags:
-        - users
-      summary: Kullanıcı listesi
-      description: Sistemdeki tüm kullanıcıları listeler (sayfalama ile)
-      operationId: listUsers
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
-        - name: role
-          in: query
-          description: Kullanıcı rolüne göre filtrele
-          schema:
-            type: string
-            enum: [admin, user, guest]
-      responses:
-        '200':
-          description: Başarılı
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserList'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Yetkisiz giriş (yanlış email veya şifre)
 
   /users/{userId}:
-    get:
-      tags:
-        - users
-      summary: Kullanıcı detayı
-      description: Belirli bir kullanıcının detay bilgilerini getirir
-      operationId: getUserById
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/UserIdParam'
-      responses:
-        '200':
-          description: Başarılı
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    
     put:
       tags:
         - users
-      summary: Kullanıcı güncelle
-      description: Kullanıcı bilgilerini günceller
+      summary: Kullanıcı hesap bilgilerini güncelleme
+      description: Kullanıcının kendi hesap bilgilerini güncellemesi. (Req 8)
       operationId: updateUser
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/UserIdParam'
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -177,81 +117,80 @@ paths:
               $ref: '#/components/schemas/UserUpdate'
       responses:
         '200':
-          description: Kullanıcı başarıyla güncellendi
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Kullanıcı bilgileri başarıyla güncellendi
         '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    
-    delete:
+          description: Bu kullanıcıyı güncelleme yetkisi yok
+          
+  /sitters/{sitterId}:
+    put:
       tags:
-        - users
-      summary: Kullanıcı sil
-      description: Kullanıcıyı sistemden siler
-      operationId: deleteUser
+        - sitters
+      summary: Bakıcı hesap bilgilerini güncelleme
+      description: Bakıcının kendi hizmet detaylarını ve profilini güncellemesi. (Req 7)
+      operationId: updateSitter
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/UserIdParam'
-      responses:
-        '204':
-          description: Kullanıcı başarıyla silindi
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-  /products:
-    get:
-      tags:
-        - products
-      summary: Ürün listesi
-      description: Tüm ürünleri listeler
-      operationId: listProducts
-      parameters:
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
-        - name: category
-          in: query
-          description: Kategoriye göre filtrele
+        - name: sitterId
+          in: path
+          required: true
           schema:
             type: string
-        - name: minPrice
-          in: query
-          description: Minimum fiyat
-          schema:
-            type: number
-            format: float
-        - name: maxPrice
-          in: query
-          description: Maximum fiyat
-          schema:
-            type: number
-            format: float
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SitterUpdate'
       responses:
         '200':
-          description: Başarılı
+          description: Bakıcı bilgileri güncellendi
+        '403':
+          description: Bu profili güncelleme yetkisi yok
+
+  /sitters:
+    get:
+      tags:
+        - sitters
+      summary: Bakıcıları listeleme ve arama
+      description: |
+        Konuma göre arama (Req 10), hayvan türüne (Req 11) ve cinsine (Req 12) göre filtreleme yapar. 
+        Her bakıcı için yorumların ortalama yıldızı (Req 6) hesaplanarak döndürülür.
+      operationId: searchSitters
+      parameters:
+        - name: location
+          in: query
+          description: Arama yapılacak konum/şehir
+          schema:
+            type: string
+        - name: petType
+          in: query
+          description: Filtrelenecek hayvan türü (ör: Kedi, Köpek)
+          schema:
+            type: string
+        - name: petBreed
+          in: query
+          description: Filtrelenecek hayvan cinsi (ör: Golden, Siyam)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Bakıcıların listesi
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductList'
-    
+                type: array
+                items:
+                  $ref: '#/components/schemas/SitterResponse'
+
+  /pets:
     post:
       tags:
-        - products
-      summary: Yeni ürün ekle
-      description: Sisteme yeni bir ürün ekler
-      operationId: createProduct
+        - pets
+      summary: Evcil hayvan profili oluşturma
+      description: Hayvan sahibinin evcil hayvanı için profil oluşturması. (Req 9)
+      operationId: createPet
       security:
         - bearerAuth: []
       requestBody:
@@ -259,77 +198,177 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductCreate'
+              $ref: '#/components/schemas/PetCreate'
       responses:
         '201':
-          description: Ürün başarıyla oluşturuldu
+          description: Evcil hayvan profili oluşturuldu
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                $ref: '#/components/schemas/PetResponse'
 
-  /products/{productId}:
-    get:
-      tags:
-        - products
-      summary: Ürün detayı
-      description: Belirli bir ürünün detay bilgilerini getirir
-      operationId: getProductById
-      parameters:
-        - $ref: '#/components/parameters/ProductIdParam'
-      responses:
-        '200':
-          description: Başarılı
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-  /orders:
-    get:
-      tags:
-        - orders
-      summary: Sipariş listesi
-      description: Kullanıcının siparişlerini listeler
-      operationId: listOrders
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
-      responses:
-        '200':
-          description: Başarılı
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderList'
-    
+  /sitters/{sitterId}/reviews:
     post:
       tags:
-        - orders
-      summary: Yeni sipariş oluştur
-      description: Yeni bir sipariş oluşturur
-      operationId: createOrder
+        - reviews
+      summary: Bakıcıya yorum yapma
+      description: Kullanıcının hizmet aldığı bakıcıya puan ve yorum bırakması. (Req 4)
+      operationId: createReview
       security:
         - bearerAuth: []
+      parameters:
+        - name: sitterId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrderCreate'
+              $ref: '#/components/schemas/ReviewCreate'
       responses:
         '201':
-          description: Sipariş başarıyla oluşturuldu
+          description: Yorum başarıyla kaydedildi
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/ReviewResponse'
+
+  /reviews/{reviewId}:
+    put:
+      tags:
+        - reviews
+      summary: Kullanıcının yaptığı yorumu güncellemesi
+      description: Kullanıcının daha önce yaptığı yorumu veya verdiği puanı düzenlemesi. (Req 16)
+      operationId: updateReview
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewCreate'
+      responses:
+        '200':
+          description: Yorum başarıyla güncellendi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+        '403':
+          description: Bu yorumu düzenleme yetkiniz yok
+
+  /admin/users/{userId}:
+    delete:
+      tags:
+        - admin
+      summary: Adminin kullanıcı silmesi
+      description: Yönetici yetkisine sahip birinin, bir kullanıcı hesabını sistemden kalıcı olarak silmesi. (Req 5)
+      operationId: adminDeleteUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Kullanıcı silme işlemi başarılı
+        '403':
+          description: Yetki yetersiz (Admin değil)
+
+  /admin/sitters/{sitterId}:
+    delete:
+      tags:
+        - admin
+      summary: Admin bakıcı silmesi
+      description: Yönetici yetkisine sahip birinin, bir bakıcı profilini sistemden kalıcı olarak silmesi. (Req 14)
+      operationId: adminDeleteSitter
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sitterId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Bakıcı silme işlemi başarılı
+        '403':
+          description: Yetki yetersiz (Admin değil)
+
+  /admin/reviews/{reviewId}:
+    delete:
+      tags:
+        - admin
+      summary: Admin sayfasında yorum silme
+      description: Yöneticinin sistemi ihlal eden uygunsuz bir yorumu silmesi. (Req 13)
+      operationId: adminDeleteReview
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Yorum silme işlemi başarılı
+        '403':
+          description: Yetki yetersiz (Admin değil)
+
+  /admin/users/{userId}/role:
+    put:
+      tags:
+        - admin
+      summary: Adminin rol güncelleme (yetkilendirme) yapması
+      description: Yöneticinin bir kullanıcının yetki düzeyini değiştirmesi (örneğin owner -> admin yapmak). (Req 15)
+      operationId: adminUpdateRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  enum: [owner, sitter, admin]
+                  description: Kullanıcıya atanacak yeni rol
+      responses:
+        '200':
+          description: Kullanıcı rolü başarıyla güncellendi
+        '403':
+          description: Yetki yetersiz (Admin değil)
 
 components:
   securitySchemes:
@@ -337,140 +376,38 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT token ile kimlik doğrulama
-
-  parameters:
-    UserIdParam:
-      name: userId
-      in: path
-      required: true
-      description: Kullanıcı ID'si
-      schema:
-        type: string
-        format: uuid
-    
-    ProductIdParam:
-      name: productId
-      in: path
-      required: true
-      description: Ürün ID'si
-      schema:
-        type: string
-        format: uuid
-    
-    PageParam:
-      name: page
-      in: query
-      description: Sayfa numarası
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-    
-    LimitParam:
-      name: limit
-      in: query
-      description: Sayfa başına kayıt sayısı
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
+      description: Yetkili işlemler için JWT token gereklidir.
 
   schemas:
-    User:
-      type: object
-      required:
-        - id
-        - email
-        - firstName
-        - lastName
-        - role
-        - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Kullanıcı benzersiz kimliği
-          example: "123e4567-e89b-12d3-a456-426614174000"
-        email:
-          type: string
-          format: email
-          description: Kullanıcı email adresi
-          example: "kullanici@example.com"
-        firstName:
-          type: string
-          description: Ad
-          example: "Ahmet"
-        lastName:
-          type: string
-          description: Soyad
-          example: "Yılmaz"
-        role:
-          type: string
-          enum: [admin, user, guest]
-          description: Kullanıcı rolü
-          example: "user"
-        createdAt:
-          type: string
-          format: date-time
-          description: Oluşturulma tarihi
-          example: "2024-01-15T10:30:00Z"
-        updatedAt:
-          type: string
-          format: date-time
-          description: Güncellenme tarihi
-          example: "2024-01-20T14:45:00Z"
-        phone:
-          type: string
-          description: Telefon numarası
-          example: "+905551234567"
-
     UserRegistration:
       type: object
       required:
         - email
         - password
-        - firstName
-        - lastName
+        - fullName
+        - role
       properties:
         email:
           type: string
           format: email
-          example: "kullanici@example.com"
+          example: esra@example.com
         password:
           type: string
           format: password
-          minLength: 8
-          example: "Guvenli123!"
-        firstName:
+          minLength: 6
+          example: GizliSifre123
+        fullName:
           type: string
-          minLength: 2
-          example: "Ahmet"
-        lastName:
+          example: Esra Yaman
+        role:
           type: string
-          minLength: 2
-          example: "Yılmaz"
-
-    UserUpdate:
-      type: object
-      properties:
-        firstName:
+          enum: [owner, sitter]
+          description: Hayvan sahibi veya bakıcı seçimi (Req 1, 2)
+          example: owner
+        location:
           type: string
-          minLength: 2
-          example: "Ahmet"
-        lastName:
-          type: string
-          minLength: 2
-          example: "Yılmaz"
-        email:
-          type: string
-          format: email
-          example: "yeniemail@example.com"
-        phone:
-          type: string
-          description: Telefon numarası
-          example: "+905551234567"
+          description: Bulunduğu şehir/ilçe
+          example: Kadıköy, İstanbul
 
     LoginCredentials:
       type: object
@@ -481,111 +418,72 @@ components:
         email:
           type: string
           format: email
-          example: "kullanici@example.com"
         password:
           type: string
           format: password
-          example: "Guvenli123!"
 
-    AuthToken:
+    AuthResponse:
       type: object
-      required:
-        - token
-        - expiresIn
-        - user
       properties:
         token:
           type: string
-          description: JWT access token
-          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-        expiresIn:
-          type: integer
-          description: Token geçerlilik süresi (saniye)
-          example: 3600
+          description: JWT Access Token
         user:
-          $ref: '#/components/schemas/User'
+          $ref: '#/components/schemas/UserResponse'
 
-    Product:
+    UserResponse:
       type: object
-      required:
-        - id
-        - name
-        - price
-        - category
-        - stock
       properties:
         id:
           type: string
           format: uuid
-          example: "987e6543-e21b-12d3-a456-426614174000"
-        name:
+        email:
           type: string
-          description: Ürün adı
-          example: "Laptop"
-        description:
+        fullName:
           type: string
-          description: Ürün açıklaması
-          example: "15.6 inç, 16GB RAM, 512GB SSD"
-        price:
-          type: number
-          format: float
-          description: Ürün fiyatı (TL)
-          example: 25999.99
-        category:
+        role:
           type: string
-          description: Ürün kategorisi
-          example: "Elektronik"
-        stock:
-          type: integer
-          description: Stok miktarı
-          example: 50
-        imageUrl:
+          enum: [owner, sitter, admin]
+        location:
           type: string
-          format: uri
-          description: Ürün görseli URL'i
-          example: "https://example.com/images/laptop.jpg"
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
 
-    ProductCreate:
+    UserUpdate:
       type: object
-      required:
-        - name
-        - price
-        - category
-        - stock
       properties:
-        name:
+        fullName:
           type: string
-          minLength: 3
-        description:
+        location:
           type: string
-        price:
-          type: number
-          format: float
-          minimum: 0
-        category:
+        phoneNumber:
           type: string
-        stock:
-          type: integer
-          minimum: 0
-        imageUrl:
+        avatarUrl:
           type: string
-          format: uri
 
-    Order:
+    SitterUpdate:
       type: object
-      required:
-        - id
-        - userId
-        - items
-        - totalAmount
-        - status
-        - createdAt
+      properties:
+        hourlyRate:
+          type: number
+          example: 250.0
+          description: Saatlik ücret (TL)
+        acceptedPetTypes:
+          type: array
+          items:
+            type: string
+          description: Bakılabilen hayvan türleri
+          example: ["Kedi", "Köpek"]
+        acceptedPetBreeds:
+          type: array
+          items:
+            type: string
+          description: Belirli bir türe ait cinsler
+          example: ["Siyam", "Golden Retriever"]
+        bio:
+          type: string
+          description: Bakıcı profil açıklaması
+
+    SitterResponse:
+      type: object
       properties:
         id:
           type: string
@@ -593,204 +491,109 @@ components:
         userId:
           type: string
           format: uuid
-        items:
+        fullName:
+          type: string
+        location:
+          type: string
+        hourlyRate:
+          type: number
+        acceptedPetTypes:
           type: array
           items:
-            $ref: '#/components/schemas/OrderItem'
-        totalAmount:
+            type: string
+        acceptedPetBreeds:
+          type: array
+          items:
+            type: string
+        bio:
+          type: string
+        averageRating:
           type: number
           format: float
-          description: Toplam tutar (TL)
-        status:
+          description: Bakıcının aldığı yorumların yıldız ortalaması (Req 6)
+          example: 4.8
+        totalReviews:
+          type: integer
+          description: Bakıcıya yapılmış toplam yorum sayısı
+
+    PetCreate:
+      type: object
+      required:
+        - name
+        - petType
+        - breed
+      properties:
+        name:
           type: string
-          enum: [pending, processing, shipped, delivered, cancelled]
-          description: Sipariş durumu
-        shippingAddress:
-          $ref: '#/components/schemas/Address'
+          example: "Leo"
+        petType:
+          type: string
+          description: Hayvan türü (Kedi, Köpek vs.) (Req 11)
+          example: "Kedi"
+        breed:
+          type: string
+          description: Hayvan cins türü (Req 12)
+          example: "Siyam"
+        age:
+          type: integer
+          example: 2
+        notes:
+          type: string
+          description: Bakım için özel notlar ve alerjiler
+          example: "Akşamüstü yalnız kalmaktan hoşlanmaz."
+
+    PetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ownerId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        petType:
+          type: string
+        breed:
+          type: string
+        age:
+          type: integer
+        notes:
+          type: string
+
+    ReviewCreate:
+      type: object
+      required:
+        - rating
+        - comment
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: 1-5 arası yıldız (Req 6)
+        comment:
+          type: string
+          description: Açıklama şeklinde inceleme
+          
+    ReviewResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sitterId:
+          type: string
+          format: uuid
+        reviewerId:
+          type: string
+          format: uuid
+        rating:
+          type: integer
+        comment:
+          type: string
         createdAt:
           type: string
           format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-
-    OrderCreate:
-      type: object
-      required:
-        - items
-        - shippingAddress
-      properties:
-        items:
-          type: array
-          minItems: 1
-          items:
-            type: object
-            required:
-              - productId
-              - quantity
-            properties:
-              productId:
-                type: string
-                format: uuid
-              quantity:
-                type: integer
-                minimum: 1
-        shippingAddress:
-          $ref: '#/components/schemas/Address'
-
-    OrderItem:
-      type: object
-      properties:
-        productId:
-          type: string
-          format: uuid
-        productName:
-          type: string
-        quantity:
-          type: integer
-        unitPrice:
-          type: number
-          format: float
-        totalPrice:
-          type: number
-          format: float
-
-    Address:
-      type: object
-      required:
-        - street
-        - city
-        - postalCode
-        - country
-      properties:
-        street:
-          type: string
-          example: "Atatürk Caddesi No:123"
-        city:
-          type: string
-          example: "İstanbul"
-        postalCode:
-          type: string
-          example: "34000"
-        country:
-          type: string
-          example: "Türkiye"
-
-    UserList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-
-    ProductList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Product'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-
-    OrderList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Order'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-          description: Mevcut sayfa
-          example: 1
-        limit:
-          type: integer
-          description: Sayfa başına kayıt
-          example: 20
-        totalPages:
-          type: integer
-          description: Toplam sayfa sayısı
-          example: 5
-        totalItems:
-          type: integer
-          description: Toplam kayıt sayısı
-          example: 95
-
-    Error:
-      type: object
-      required:
-        - code
-        - message
-      properties:
-        code:
-          type: string
-          description: Hata kodu
-          example: "VALIDATION_ERROR"
-        message:
-          type: string
-          description: Hata mesajı
-          example: "Geçersiz email adresi"
-        details:
-          type: array
-          description: Detaylı hata bilgileri
-          items:
-            type: object
-            properties:
-              field:
-                type: string
-                example: "email"
-              message:
-                type: string
-                example: "Email formatı geçersiz"
-
-  responses:
-    BadRequest:
-      description: Geçersiz istek
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            code: "BAD_REQUEST"
-            message: "İstek parametreleri geçersiz"
-    
-    Unauthorized:
-      description: Yetkisiz erişim
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            code: "UNAUTHORIZED"
-            message: "Kimlik doğrulama başarısız"
-    
-    NotFound:
-      description: Kaynak bulunamadı
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            code: "NOT_FOUND"
-            message: "İstenen kaynak bulunamadı"
-    
-    Forbidden:
-      description: Erişim reddedildi
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            code: "FORBIDDEN"
-            message: "Bu işlem için yetkiniz bulunmamaktadır"
-``
+```
