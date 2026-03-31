@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  OWNER
+  SITTER
+  ADMIN
+}
+
+// 1. Kullanıcı Tablosu
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String   // Hashed olarak tutulmalı
+  fullName    String
+  role        Role     @default(OWNER)
+  location    String?
+  phoneNumber String?
+  avatarUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // İlişkiler
+  sitterProfile SitterProfile?
+  pets          Pet[]
+  reviewsGiven  Review[]       @relation("Reviewer")
+}
+
+// 2. Bakıcı Detay Profili Tablosu 
+// (Sadece role=SITTER olanların dolduracağı veriler)
+model SitterProfile {
+  id                String   @id @default(uuid())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String   @unique
+  hourlyRate        Float?
+  acceptedPetTypes  String[] // ["Kedi", "Köpek"]
+  acceptedPetBreeds String[] // ["Golden Retriever"]
+  bio               String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // İlişkiler
+  reviewsReceived   Review[] @relation("Sitter")
+}
+
+// 3. Evcil Hayvan Profili
+// TOPRAK YAVUZ GOREV: 9
+model Pet {
+  id        String   @id @default(uuid())
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String
+  name      String
+  petType   String   // Tür: Kedi, Köpek vs.
+  breed     String   // Cins
+  age       Int?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 4. Bakıcı Değerlendirme (Yorum/Puan) Tablosu
+model Review {
+  id         String        @id @default(uuid())
+  sitter     SitterProfile @relation("Sitter", fields: [sitterId], references: [id], onDelete: Cascade)
+  sitterId   String
+  reviewer   User          @relation("Reviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewerId String
+  rating     Int           // 1-5 arası yıldız
+  comment    String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
