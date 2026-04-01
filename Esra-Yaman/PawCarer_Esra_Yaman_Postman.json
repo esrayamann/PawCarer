@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "PawCarer - Esra Yaman API Testleri",
+    "name": "Paw-Carer - Esra Yaman API Testleri",
     "description": "PawCarer backend API testleri (Vercel domain vs localhost).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
