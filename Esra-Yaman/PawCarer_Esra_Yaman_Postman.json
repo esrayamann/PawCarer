@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "PawCarer - Esra Yaman API Testleri",
+    "name": "Paw-Carer - Esra Yaman API Testleri",
     "description": "PawCarer backend API testleri (Vercel domain vs localhost).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -24,8 +24,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "register"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
             }
           }
         },
@@ -45,8 +51,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
             }
           }
         }
@@ -81,8 +93,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/users/{{userId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "{{userId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ]
             }
           }
         },
@@ -112,8 +130,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/sitters/{{sitterProfileId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "sitters", "{{sitterProfileId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sitters",
+                "{{sitterProfileId}}"
+              ]
             }
           }
         }
@@ -148,8 +172,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/sitters/{{sitterProfileId}}/reviews",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "sitters", "{{sitterProfileId}}", "reviews"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sitters",
+                "{{sitterProfileId}}",
+                "reviews"
+              ]
             }
           }
         },
@@ -170,8 +201,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/admin/users/{{targetUserId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "users", "{{targetUserId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "{{targetUserId}}"
+              ]
             }
           }
         }
@@ -181,7 +219,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "https://pawcarer-esra-backend.vercel.app",
+      "value": "https://paw-carer.vercel.app",
       "type": "string",
       "description": "Vercel üzerinde yayına aldığınız gerçek projenizin domain adresi. (Örn: https://projem.vercel.app)"
     },
