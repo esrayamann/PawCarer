@@ -1,11 +1,10 @@
 import { NextRequest } from "next/server";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "default_secret_key";
 
 /**
- * Kimlik doğrulama işlemleri için geçici yardımcı fonksiyon.
- * Esra Yaman (JWT / Auth) geliştirmelerini tamamlayana kadar,
- * Authorization başlığındaki Bearer token'ı doğrudan userId olarak kabul ediyoruz.
- * 
- * Kullanım Örneği: headers: { Authorization: "Bearer <gercek-uuid-buraya>" }
+ * Kullanıcı yetkilendirmesi için Bearer Token (JWT) içinden User ID doğrulama.
  */
 export function getUserIdFromRequest(request: NextRequest): string | null {
   const authHeader = request.headers.get("Authorization");
@@ -14,7 +13,37 @@ export function getUserIdFromRequest(request: NextRequest): string | null {
     return null;
   }
 
-  // "Bearer " kısmını atıp geriye kalan stringi userId olarak dönüyoruz
   const token = authHeader.split(" ")[1];
-  return token || null;
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string, role: string };
+    return decoded.userId;
+  } catch (error) {
+    // Geçersiz veya süresi dolmuş token
+    return null;
+  }
+}
+
+/**
+ * Giriş sonrası token yaratan yardımcı fonksiyon
+ */
+export function generateToken(userId: string, role: string): string {
+  return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: "7d" });
+}
+
+export function getUserRoleFromRequest(request: NextRequest): string | null {
+  const authHeader = request.headers.get("Authorization");
+  
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authHeader.split(" ")[1];
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string, role: string };
+    return decoded.role;
+  } catch (error) {
+    return null;
+  }
 }
