@@ -62,43 +62,43 @@ export default function RegisterOwner() {
         <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
           <div>
             <label className="block text-sm font-semibold text-[#3A3029] mb-1">Ad Soyad</label>
-            <input 
+            <input
               required
-              className="input-field" 
-              placeholder="Örn: Esra Yaman" 
+              className="input-field"
+              placeholder="Örn: Ali Tutar"
               value={formData.fullName}
-              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
             />
           </div>
           <div>
             <label className="block text-sm font-semibold text-[#3A3029] mb-1">E-Posta</label>
-            <input 
+            <input
               required
               type="email"
-              className="input-field" 
+              className="input-field"
               placeholder="isim@ornek.com"
               value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
           <div>
             <label className="block text-sm font-semibold text-[#3A3029] mb-1">Şifre</label>
-            <input 
+            <input
               required
               type="password"
-              className="input-field" 
+              className="input-field"
               placeholder="••••••••"
               value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
           </div>
           <div>
             <label className="block text-sm font-semibold text-[#3A3029] mb-1">Şehir / Lokasyon</label>
-            <input 
-              className="input-field" 
+            <input
+              className="input-field"
               placeholder="Örn: Kadıköy, İstanbul"
               value={formData.location}
-              onChange={(e) => setFormData({...formData, location: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             />
           </div>
 
@@ -108,7 +108,7 @@ export default function RegisterOwner() {
         </form>
 
         <p className="mt-6 text-center text-sm text-[#857D77] relative z-10">
-          Bakıcı olarak mı hizmet vermek istersiniz? <br/>
+          Bakıcı olarak mı hizmet vermek istersiniz? <br />
           <Link href="/register/sitter" className="text-[#F47B20] font-semibold hover:underline">Sitter (Bakıcı) Kaydı Yapın</Link>
         </p>
       </div>
