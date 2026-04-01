@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Paw-Carer - Esra Yaman API Testleri",
-    "description": "PawCarer backend API testleri (Vercel domain vs localhost).",
+    "description": "PawCarer backend API testleri (Vercel domain).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -9,7 +9,7 @@
       "name": "1. Kimlik Doğrulama",
       "item": [
         {
-          "name": "1. Kayıt Ol (Register)",
+          "name": "1. Müşteri (Owner) Kayıt Ol",
           "request": {
             "method": "POST",
             "header": [
@@ -20,23 +20,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"deneme@esra.com\",\n  \"password\": \"123456\",\n  \"fullName\": \"Esra Test\",\n  \"role\": \"OWNER\"\n}"
+              "raw": "{\n  \"email\": \"owner@esra.com\",\n  \"password\": \"123456\",\n  \"fullName\": \"Esra Hayvan Sahibesi\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "register"
-              ]
+              "raw": "{{baseUrl}}/api/auth/register/owner",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register", "owner"]
             }
           }
         },
         {
-          "name": "2. Giriş Yap (Login)",
+          "name": "2. Bakıcı (Sitter) Kayıt Ol",
           "request": {
             "method": "POST",
             "header": [
@@ -47,18 +41,33 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"deneme@esra.com\",\n  \"password\": \"123456\"\n}"
+              "raw": "{\n  \"email\": \"sitter@esra.com\",\n  \"password\": \"123456\",\n  \"fullName\": \"Esra Bakıcı\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register/sitter",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register", "sitter"]
+            }
+          }
+        },
+        {
+          "name": "3. Giriş Yap (Login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"owner@esra.com\",\n  \"password\": \"123456\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "login"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
             }
           }
         }
@@ -68,7 +77,7 @@
       "name": "2. Profil Güncelleme",
       "item": [
         {
-          "name": "3. Kullanıcı Bilgilerini Güncelle (Req 8)",
+          "name": "8. Kullanıcı Hesap Bilgilerini Güncelle",
           "request": {
             "auth": {
               "type": "bearer",
@@ -92,27 +101,21 @@
               "raw": "{\n  \"fullName\": \"Esra Yaman (Güncel)\",\n  \"location\": \"Kadıköy, İstanbul\",\n  \"phoneNumber\": \"0555 123 4567\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/users/{{userId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "{{userId}}"
-              ]
+              "raw": "{{baseUrl}}/api/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "profile"]
             }
           }
         },
         {
-          "name": "4. Bakıcı Bilgilerini Güncelle (Req 7)",
+          "name": "7. Bakıcı Hesap Bilgilerini Güncelle",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{authToken}}",
+                  "value": "{{sitterAuthToken}}",
                   "type": "string"
                 }
               ]
@@ -129,15 +132,9 @@
               "raw": "{\n  \"hourlyRate\": 450.5,\n  \"bio\": \"Hayvanları çok severim ve 3 yıldır bakıcılık yapıyorum!\",\n  \"acceptedPetTypes\": [\"Kedi\", \"Köpek\"],\n  \"acceptedPetBreeds\": [\"Siyam\", \"Golden Retriever\"]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/sitters/{{sitterProfileId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "sitters",
-                "{{sitterProfileId}}"
-              ]
+              "raw": "{{baseUrl}}/api/sitters/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sitters", "profile"]
             }
           }
         }
@@ -147,7 +144,7 @@
       "name": "3. Yorum & Admin",
       "item": [
         {
-          "name": "5. Bakıcıya Yorum Yap (Req 4)",
+          "name": "4. Bakıcıya Yorum Yap",
           "request": {
             "auth": {
               "type": "bearer",
@@ -168,24 +165,29 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Gerçekten harika ilgilendi, gözüm hiç arkada kalmadı! Puanım tam!\"\n}"
+              "raw": "{\n  \"sitterId\": \"{{sitterProfileId}}\",\n  \"rating\": 5,\n  \"comment\": \"Gerçekten harika ilgilendi, gözüm hiç arkada kalmadı!\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/sitters/{{sitterProfileId}}/reviews",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "sitters",
-                "{{sitterProfileId}}",
-                "reviews"
-              ]
+              "raw": "{{baseUrl}}/api/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews"]
             }
           }
         },
         {
-          "name": "6. Admin: Kullanıcı Sil (Req 5)",
+          "name": "5. Yorumlarda Yıldız Ortalaması Alma",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sitters/{{sitterProfileId}}/rating",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "sitters", "{{sitterProfileId}}", "rating"]
+            }
+          }
+        },
+        {
+          "name": "6. Admin: Kullanıcı Sil",
           "request": {
             "auth": {
               "type": "bearer",
@@ -201,15 +203,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/admin/users/{{targetUserId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "admin",
-                "users",
-                "{{targetUserId}}"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users", "{{targetUserId}}"]
             }
           }
         }
@@ -220,30 +215,26 @@
     {
       "key": "baseUrl",
       "value": "https://paw-carer.vercel.app",
-      "type": "string",
-      "description": "Vercel üzerinde yayına aldığınız gerçek projenizin domain adresi. (Örn: https://projem.vercel.app)"
+      "type": "string"
     },
     {
       "key": "authToken",
-      "value": "BURAYA_GIRIS_YAPTIGINIZDA_DONEN_TOKEN_GELECEK",
-      "type": "string",
-      "description": "Login işleminden (2. API) dönen JWT tokeni buraya yapıştırılmalıdır."
+      "value": "OWNER_KULLANICISININ_TOKENI",
+      "type": "string"
     },
     {
-      "key": "userId",
-      "value": "BURAYA_KENDI_ID_NUMARASI_GELECEK",
-      "type": "string",
-      "description": "Login sonrası dönen kullanıcı ID'si ('id' veya 'userId' olabilir)."
+      "key": "sitterAuthToken",
+      "value": "SITTER_KULLANICISININ_TOKENI",
+      "type": "string"
     },
     {
       "key": "sitterProfileId",
-      "value": "BURAYA_BAKICI_PROFIL_IDSI_GELECEK",
-      "type": "string",
-      "description": "Güncellenecek veya yorum yapayacak SitterProfile ID'si"
+      "value": "ÖRN_YORUM_YAPILACAK_BAKICININ_IDSI",
+      "type": "string"
     },
     {
       "key": "adminAuthToken",
-      "value": "ADMIN_ROLUNDEKİ_KULLANICININ_TOKENI",
+      "value": "ADMIN_KULLANICISININ_TOKENI",
       "type": "string"
     },
     {
