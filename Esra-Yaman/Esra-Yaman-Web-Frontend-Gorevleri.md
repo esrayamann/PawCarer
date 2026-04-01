@@ -1,141 +1,125 @@
-# Ali Tutar'ın Web Frontend Görevleri
-**Front-end Test Videosu:** [Link buraya eklenecek](https://example.com)
+# Esra Yaman Web Frontend Görevleri
 
-## 1. Üye Olma (Kayıt) Sayfası
-- **API Endpoint:** `POST /auth/register`
-- **Görev:** Kullanıcı kayıt işlemi için web sayfası tasarımı ve implementasyonu
-- **UI Bileşenleri:**
-  - Responsive kayıt formu (desktop ve mobile uyumlu)
-  - Email input alanı (type="email", autocomplete="email")
-  - Şifre input alanı (type="password", şifre gücü göstergesi)
-  - Şifre tekrar input alanı (doğrulama için)
-  - Ad (firstName) input alanı (autocomplete="given-name")
-  - Soyad (lastName) input alanı (autocomplete="family-name")
-  - "Kayıt Ol" butonu (primary button style)
-  - "Zaten hesabınız var mı? Giriş Yap" linki
-  - Loading spinner (kayıt işlemi sırasında)
-  - Form container (card veya centered layout)
-- **Form Validasyonu:**
-  - HTML5 form validation (required, pattern attributes)
-  - JavaScript real-time validation
-  - Email format kontrolü (regex pattern)
-  - Şifre güvenlik kuralları (min 8 karakter, büyük/küçük harf, rakam)
-  - Şifre eşleşme kontrolü
-  - Ad ve soyad boş olamaz kontrolü
-  - Tüm alanlar geçerli olmadan buton disabled
-  - Client-side ve server-side validation
-- **Kullanıcı Deneyimi:**
-  - Form hatalarını input altında gösterilmesi (inline validation)
-  - Başarılı kayıt sonrası success notification ve otomatik giriş sayfasına yönlendirme
-  - Hata durumlarında kullanıcı dostu mesajlar (409 Conflict: "Bu email zaten kullanılıyor")
-  - Form submission prevention (double-click koruması)
-  - Accessible form labels ve ARIA attributes
-  - Keyboard navigation desteği (Tab, Enter)
-- **Teknik Detaylar:**
-  - Framework: React/Vue/Angular veya Vanilla JS
-  - Form library: React Hook Form, Formik, veya native HTML5
-  - State management (form state, loading state, error state)
-  - Routing (kayıt sayfasından giriş sayfasına geçiş)
-  - SEO optimization (meta tags, structured data)
-  - Accessibility (WCAG 2.1 AA compliance)
+**Web Frontend Domain Adresi:** `https://paw-carer.vercel.app`
+**Front-end Test Videosu:** [Ödev Videosu Linkini Buraya Ekleyiniz](https://youtube.com/...)
 
-## 2. Kullanıcı Profil Görüntüleme Sayfası
-- **API Endpoint:** `GET /users/{userId}`
-- **Görev:** Kullanıcı profil bilgilerini görüntüleme sayfası tasarımı ve implementasyonu
-- **UI Bileşenleri:**
-  - Responsive profil layout (desktop: sidebar + content, mobile: stacked)
-  - Profil fotoğrafı alanı (circular avatar, placeholder veya gerçek fotoğraf)
-  - Kullanıcı adı ve soyadı (H1 heading)
-  - Email adresi (icon + text, copy to clipboard özelliği)
-  - Telefon numarası (icon + text, varsa)
-  - Hesap oluşturulma tarihi (formatted date)
-  - "Profili Düzenle" butonu (secondary button)
-  - "Hesabı Sil" butonu (danger button, alt kısımda)
-  - Refresh butonu veya auto-refresh
-  - Breadcrumb navigation (opsiyonel)
-- **Kullanıcı Deneyimi:**
-  - Loading skeleton screen (veri yüklenirken)
-  - Empty state (veri yoksa)
-  - Error state (yükleme hatası durumunda retry butonu)
-  - Smooth page transitions
-  - Profil fotoğrafı için placeholder avatar (initials)
-  - Responsive grid layout
-  - Print-friendly styles
-- **Teknik Detaylar:**
-  - Lazy loading images (profil fotoğrafları için)
-  - Image optimization (WebP format, responsive images)
-  - Client-side caching (localStorage/sessionStorage)
-  - State management (user data, loading, error states)
-  - Routing (profil düzenleme sayfasına geçiş)
-  - Deep linking desteği (profil paylaşımı için)
-  - Meta tags (Open Graph, Twitter Cards)
+---
 
-## 3. Kullanıcı Profil Düzenleme Sayfası
-- **API Endpoint:** `PUT /users/{userId}`
-- **Görev:** Kullanıcı profil bilgilerini düzenleme sayfası tasarımı ve implementasyonu
+## 1. Müşteri (Owner) Kayıt Sayfası
+- **API Endpoint:** `POST /api/auth/register/owner`
+- **Frontend Rotası:** `/register/owner`
+- **Görev:** Hayvan sahiplerinin sisteme kayıt olmasını sağlayan arayüz tasarımı.
 - **UI Bileşenleri:**
-  - Responsive düzenleme formu
-  - Profil fotoğrafı düzenleme alanı (drag & drop upload, preview)
-  - Ad (firstName) input alanı (mevcut değerle dolu)
-  - Soyad (lastName) input alanı (mevcut değerle dolu)
-  - Email input alanı (mevcut değerle dolu, düzenlenebilir)
-  - Telefon numarası input alanı (mevcut değerle dolu, format maskesi)
-  - "Kaydet" butonu (primary button, sağ üst veya form altında)
-  - "İptal" butonu (secondary button, sol üst veya form altında)
-  - Değişiklik yapıldığında "Kaydet" butonu aktif olur
-  - Unsaved changes indicator
-- **Form Validasyonu:**
-  - Email format kontrolü (real-time)
-  - Telefon numarası format kontrolü (ülke kodu desteği, input masking)
-  - Real-time validation feedback
-  - Değişiklik yoksa "Kaydet" butonu disabled
-  - File upload validation (image type, size limits)
+  - Glassmorphism özellikli responsive kayıt formu.
+  - Ad, soyad, e-posta, şifre ve lokasyon veri giriş alanları.
+  - "Hayvan Sahibi Hesabı Oluştur" onay butonu (Primary).
+  - Yönlendirme linki: "Bakıcı olarak mı hizmet vermek istersiniz?"
 - **Kullanıcı Deneyimi:**
-  - Optimistic update (kaydet butonuna basıldığında UI anında güncellenir)
-  - Başarılı güncelleme sonrası success notification (toast/snackbar)
-  - Hata durumunda error mesajı ve değişiklikler geri alınır
-  - "İptal" butonuna basıldığında değişiklik kaybı için browser confirmation dialog
-  - Beforeunload event (sayfa kapatılırken uyarı)
-  - Image preview (upload öncesi)
-  - Progress indicator (image upload için)
-- **Teknik Detaylar:**
-  - Form state management (initial values, edited values, dirty state)
-  - File upload component (drag & drop, file picker)
-  - Image compression (client-side, before upload)
-  - Image preview functionality
-  - Routing (geri dönüş, kaydetme sonrası profil sayfasına dönüş)
-  - Unsaved changes warning (browser navigation)
-  - Form persistence (localStorage, draft saving)
-
-## 4. Hesap Silme Akışı
-- **API Endpoint:** `DELETE /users/{userId}`
-- **Görev:** Kullanıcı hesabını silme işlemi için web UI akışı tasarımı ve implementasyonu
-- **UI Bileşenleri:**
-  - "Hesabı Sil" butonu (profil sayfasında, danger button style)
-  - Modal dialog (destructive action için)
-  - Şifre doğrulama alanı (güvenlik için opsiyonel)
-  - Son onay ekranı (uyarı mesajları ile)
-  - "Emin misiniz?" confirmation dialog (çift onay mekanizması)
-  - Warning icons ve visual cues
-- **Kullanıcı Deneyimi:**
-  - Destructive action için görsel uyarılar (kırmızı renk, warning icons)
-  - Açık ve net uyarı mesajları ("Bu işlem geri alınamaz")
-  - İptal seçeneği her zaman mevcut (modal close, cancel button)
-  - Silme işlemi sırasında loading indicator
-  - Başarılı silme sonrası logout ve login sayfasına yönlendirme
-  - Success message gösterilmesi
+  - Sayfa yüklendiğinde slide-up mikro-animasyon tetiklenmesi.
+  - Boş bırakılamaz zorunlu alanlar için HTML5 validation.
+  - Kayıt esnasında butonun "Kaydediliyor..." state'ine sokularak çoklu tıklamanın engellenmesi.
+  - Başarılı işlem sonrası anında login sayfasına "Kayıt Başarılı" parametresi ile yönlendirme.
 - **Akış Adımları:**
-  1. Profil sayfasında "Hesabı Sil" butonuna tıklama
-  2. İlk uyarı modal dialog'u gösterilmesi
-  3. Onaylandığında şifre doğrulama (opsiyonel)
-  4. Son onay ekranı (detaylı uyarılar, checkbox confirmation)
-  5. Silme işlemi gerçekleştirme
-  6. Başarılı silme sonrası logout ve login sayfasına yönlendirme
+  1. Kullanıcı müşteri kayıt linkine tıklar.
+  2. Bilgileri doldurup kayıt butonuna basar.
+  3. API 201 dönerse form temizlenir ve `/login` rotasına gönderilir.
 - **Teknik Detaylar:**
-  - Modal/Dialog component kullanımı
-  - Multi-step flow yönetimi (state machine veya step-based)
-  - Error handling (silme başarısız olursa)
-  - Logout işlemi entegrasyonu
-  - Session storage ve localStorage temizleme
-  - Redirect handling (login sayfasına dönüş)
-  - Browser history management
+  - React `useState` kullanılarak form verilerinin JSON objesinde tutulması.
+  - `fetch` API ile Server'a JSON body basılması.
+  - Vercel App Router yapısı üzerine inşa.
+
+## 2. Bakıcı (Sitter) Kayıt Sayfası
+- **API Endpoint:** `POST /api/auth/register/sitter`
+- **Frontend Rotası:** `/register/sitter`
+- **Görev:** Hizmet verecek bakıcılar için özel detaylı kayıt formu.
+- **UI Bileşenleri:**
+  - Bakıcı konseptine (yeşil tonlu odaklı) uygun renk paletli arayüz.
+  - Kişisel bilgilerin ve "Hizmet Bölgesi" girdi alanlarının oluşturulması.
+  - "Bakıcı Profilimi Başlat" butonu (Secondary).
+- **Kullanıcı Deneyimi:**
+  - Hata oluşursa (409 Conflict vb) kırmızı alert paneli ile detaylı bilgilendirme.
+  - Müşteri profilinden ayrıştırmak için görsel farklılıklar.
+- **Akış Adımları:**
+  1. Kullanıcı bakıcı hesabı açma formuna girer.
+  2. Konum vb. ek detayları ile submit eder.
+  3. Kayıtlı e-posta hatası almazsa giriş sayfasına iletilir.
+- **Teknik Detaylar:**
+  - API katmanına `location` ve `fullName` değişkenlerinin JSON formatında iletilmesi.
+
+## 3. Giriş Yap (Login) Arayüzü
+- **API Endpoint:** `POST /api/auth/login`
+- **Frontend Rotası:** `/login`
+- **Görev:** Sisteme kayıtlı her iki rol için de Login işlemlerinin yönetildiği arayüz.
+- **UI Bileşenleri:**
+  - PawCarer maskot ikonu içeren stilize edilmiş giriş kutusu.
+  - E-Posta ve maskeli (type="password") şifre alanı.
+  - Yeni kayıttan gelenler için başarılı kayıt yeşil barı.
+- **Kullanıcı Deneyimi:**
+  - `?registered=true` URL verisi gelmişse kullanıcı tebrik edilir.
+  - Yanlış girdi halinde `error` metni panel içerisinde anında belirmesi.
+- **Akış Adımları:**
+  1. E-Posta ve Şifre bilgileri ile `POST` isteği yapılır.
+  2. Başarılı dönüşte alınan `JWT Token` sisteme iz bırakır.
+  3. Kişi hiç beklemeden `/profile` ekranına alınır.
+- **Teknik Detaylar:**
+  - Dönen kimlik bilgilerinin ve `token` verisinin Client Side `localStorage` üzerine geçici kaydı.
+  - Next.js Client Component yapısı ile React Hook'larının tam izolasyon kullanımı.
+
+## 4. Kullanıcı / Bakıcı Profil Güncelleme Paneli
+- **API Endpoint:** `PUT /api/users/profile` & `PUT /api/sitters/profile`
+- **Frontend Rotası:** `/profile`
+- **Görev:** Kimlik doğrulaması yapılmış hesapların kişisel verilerini güncellemesi.
+- **UI Bileşenleri:**
+  - Rol belirten uyarı rozeti (Rozet rengi role göre değişir).
+  - Ad ve lokasyon güncellemeleri için input alanları.
+  - Eğer rol `SITTER` ise açılan "Saatlik Ücret" ve "Biyografi" alanları.
+  - Çıkış Yap butonu (Log out).
+- **Kullanıcı Deneyimi:**
+  - LocalStorage'daki rol değişkenine göre ekranın anında adapte olması.
+  - Sayfa girişinde eski verilerin inputlar içine hazır olarak dolması.
+  - Onay sonrası anlık "Başarıyla güncellendi 🎉" tatmin mesajı.
+- **Akış Adımları:**
+  1. Login yetkisi onayı yapılır (Yoksa login'e gönderilir).
+  2. Kullanıcı istediği veri alanını değiştirir.
+  3. Önce User API'ye, ardından gerekiyorsa Sitter API'ye `PUT` isteği gider.
+- **Teknik Detaylar:**
+  - Token eşliğinde `Authorization: Bearer <token>` Header eklentisinin yapılması.
+  - Dinamik Render (Conditional Rendering) yapısının `user.role` kontrolü ile tasarlanması.
+
+## 5. Bakıcı Detay ve Yorum Yapma Sayfası
+- **API Endpoints:** `GET /api/sitters/{sitterId}/rating` & `POST /api/reviews`
+- **Frontend Rotası:** `/sitters/[id]`
+- **Görev:** Herkese açık bakıcı detaylarını çekme ve hesapla sisteme giriş yapanların yorum yapabilmesi.
+- **UI Bileşenleri:**
+  - Avatar, Lokasyon, İsim barındıran dinamik Header Bölümü.
+  - Toplam Yıldız ve Toplam Değerlendirme istatistik kümesi.
+  - Yorum yazmak için form ve tıklanabilir 5 adet Yıldız ikonları.
+- **Kullanıcı Deneyimi:**
+  - Hangi yıldıza basarsan öncekinin de turuncuya boyanması (Real-time feedback).
+  - Veri bulunamazsa Placeholder "..." metninin gelmesi.
+- **Akış Adımları:**
+  1. `[id]` paramı kullanılarak `GET` işlemi ile ortalama yıldız puanı çekilir.
+  2. Ziyaretçi yıldıza tıklayıp metnini yazar ve "Gönder" der.
+  3. O esnada `localStorage` kontrolü yapılır, giriş yapmamışsa hata verir.
+  4. İşlem geçtikten sonra Rating yeniden çekilip sayfada taze hali gösterilir.
+- **Teknik Detaylar:**
+  - Next.js `use` yapısı ile Asenkron parameter okunması.
+  - İki farklı API ucunun aynı Component içinde asenkron zincirde kullanımı.
+
+## 6. Admin Kullanıcı Silme Paneli
+- **API Endpoint:** `DELETE /api/admin/users/{userId}`
+- **Frontend Rotası:** `/admin/users`
+- **Görev:** Sistem güvenliği adına ihlal yapan profilleri sonsuza dek silme işlemi.
+- **UI Bileşenleri:**
+  - Adminlere özel kırmızı border'lı tehlike paneli.
+  - Kullanıcı ID'si için text input ucu.
+  - Dev kırmızı "Hesabı Yok Et" aksiyonu.
+- **Kullanıcı Deneyimi:**
+  - Rol ADMIN değilse devasa "Erişim Reddedildi ⛔️" uyarısını görüp işlemin engellenmesi.
+  - Yanlış tıklamalara karşı Browser Confirmation (Çift Onay) dialogu çıkması ("Kalıcı olarak silinecek emin misiniz?").
+- **Akış Adımları:**
+  1. Admin ID girip butona basar.
+  2. Tarayıcı Emin Misin modülü döner. Onaylanırsa DELETE isteği yollanır.
+- **Teknik Detaylar:**
+  - JWT Token güvencesi ile sunucu tabanlı `DELETE` işlemi.
+  - Hatalı giriş veya yetkisiz erişimlerde React try-catch bloğu kullanılarak client-side hata yönetimi.

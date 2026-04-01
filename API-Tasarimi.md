@@ -28,9 +28,9 @@ info:
     email: support@pawcarer.com
 
 servers:
-  - url: https://api.pawcarer.com/v1
+  - url: https://paw-carer.vercel.app/api
     description: Production server
-  - url: http://localhost:3000/v1
+  - url: http://localhost:3000/api
     description: Development server
 
 tags:
