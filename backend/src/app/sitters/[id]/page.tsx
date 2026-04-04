@@ -1,127 +1,225 @@
 "use client";
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 
-export default function SitterDetail({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
-  const sitterId = resolvedParams.id;
+const PET_ICON: Record<string, string> = {
+  Kedi: "🐱", Köpek: "🐶", Kuş: "🦜", Tavşan: "🐰", Balık: "🐟", Diğer: "🐾",
+};
 
-  const [ratingData, setRatingData] = useState<{ averageRating: number, totalReviews: number } | null>(null);
-  
-  // Review form state
-  const [rating, setRating] = useState<number>(5);
-  const [comment, setComment] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+type Review = {
+  id: string;
+  rating: number;
+  comment: string;
+  reviewerName: string;
+};
+
+type SitterDetail = {
+  id: string;
+  userId: string;
+  fullName: string;
+  location: string;
+  hourlyRate: number;
+  acceptedPetTypes: string[];
+  acceptedPetBreeds: string[];
+  bio: string;
+  averageRating: number;
+  totalReviews: number;
+  reviews: Review[];
+};
+
+export default function SitterProfilePage() {
+  const params = useParams();
+  const router = useRouter();
+  const sitterId = params?.id as string;
+
+  const [sitter, setSitter] = useState<SitterDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  // Yorum formu
+  const [token, setToken] = useState("");
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
+  const [reviewMsg, setReviewMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [reviewSaving, setReviewSaving] = useState(false);
 
   useEffect(() => {
-    // Sitter in yildiz ortalamasini cek
-    fetch(`/api/sitters/${sitterId}/rating`)
-      .then(res => res.json())
-      .then(data => {
-        if(data.averageRating !== undefined) {
-          setRatingData(data);
-        }
-      })
-      .catch(err => console.error("Rating cekilemedi", err));
+    setToken(localStorage.getItem("pawcarer_token") || "");
+    fetchSitter();
   }, [sitterId]);
 
-  const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const fetchSitter = async () => {
     setLoading(true);
-    setMessage('');
-
-    const token = localStorage.getItem('pawcarer_token');
-    if(!token) {
-      setMessage('Hata: Yorum yapabilmek için lütfen önce giriş yapın.');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const res = await fetch('/api/reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          sitterId,
-          rating,
-          comment
-        })
-      });
-
-      if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.message || 'Yorum gönderilemedi.');
-      }
-
-      setMessage('Yorumunuz başarıyla eklendi! Teşekkürler.');
-      setComment('');
-      
-      // Update rating data visually
-      fetch(`/api/sitters/${sitterId}/rating`)
-        .then(res => res.json())
-        .then(data => setRatingData(data));
-
-    } catch (err: any) {
-      setMessage(`Hata: ${err.message}`);
+      const res = await fetch(`/api/sitters/${sitterId}`);
+      if (res.status === 404) { setNotFound(true); return; }
+      if (!res.ok) throw new Error();
+      setSitter(await res.json());
+    } catch {
+      setNotFound(true);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto py-10 animate-slide-up">
-      {/* Sitter Header Profile */}
-      <div className="glass-panel p-8 mb-8 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#F47B20] opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-        
-        <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
-          <div className="w-32 h-32 bg-[#8B5A2B] rounded-full flex justify-center items-center text-5xl flex-shrink-0 shadow-lg text-white border-4 border-white">
-            👱‍♀️
+  const submitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) {
+      setReviewMsg({ type: "error", text: "Yorum yapabilmek için giriş yapmanız gerekiyor." });
+      return;
+    }
+    setReviewSaving(true);
+    setReviewMsg(null);
+    try {
+      const res = await fetch(`/api/sitters/${sitterId}/reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ rating: reviewForm.rating, comment: reviewForm.comment }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.error || "Yorum gönderilemedi.");
+      setReviewMsg({ type: "success", text: "Yorumunuz başarıyla gönderildi! ⭐" });
+      setReviewForm({ rating: 5, comment: "" });
+      fetchSitter(); // Yorumları yenile
+    } catch (err: any) {
+      setReviewMsg({ type: "error", text: err.message });
+    } finally {
+      setReviewSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="max-w-3xl mx-auto py-12 px-4 animate-pulse">
+        <div className="bg-white rounded-3xl p-8 border border-gray-100">
+          <div className="flex gap-6 mb-8">
+            <div className="w-24 h-24 bg-gray-200 rounded-full" />
+            <div className="flex-1 space-y-3">
+              <div className="h-6 bg-gray-200 rounded w-1/3" />
+              <div className="h-4 bg-gray-200 rounded w-1/4" />
+              <div className="h-4 bg-gray-200 rounded w-1/5" />
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold text-[#3A3029]">Harika Bakıcı Profili</h1>
-            <p className="text-[#8B5A2B] font-medium mt-1">İstanbul, Türkiye</p>
-            
-            {/* Yildiz Ortalamasi */}
-            <div className="mt-4 flex items-center gap-3 bg-white/60 px-4 py-2 rounded-full inline-flex">
-              <span className="text-2xl">⭐</span>
-              <div>
-                <div className="font-bold text-[#3A3029] text-lg">
-                  {ratingData ? ratingData.averageRating.toFixed(1) : '...'} / 5.0
-                </div>
-                <div className="text-xs text-[#857D77]">
-                  {ratingData ? ratingData.totalReviews : 0} Değerlendirme
-                </div>
+          <div className="space-y-3">
+            <div className="h-4 bg-gray-200 rounded" />
+            <div className="h-4 bg-gray-200 rounded w-4/5" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (notFound || !sitter) {
+    return (
+      <div className="max-w-lg mx-auto py-20 text-center">
+        <div className="text-6xl mb-4">🔍</div>
+        <h1 className="text-2xl font-bold text-[#8B5A2B] mb-2">Bakıcı Bulunamadı</h1>
+        <p className="text-[#857D77] mb-6">Bu profil mevcut değil veya silinmiş olabilir.</p>
+        <button onClick={() => router.back()} className="px-6 py-2.5 bg-[#F47B20] text-white rounded-xl font-semibold">
+          ← Geri Dön
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto py-8 px-4">
+      {/* Geri Butonu */}
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-sm text-[#857D77] hover:text-[#F47B20] transition-colors mb-6 font-medium"
+      >
+        ← Arama Sonuçlarına Dön
+      </button>
+
+      {/* Bakıcı Başlık Kartı */}
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+        <div className="bg-gradient-to-r from-[#FFF8F2] to-[#FFEEDD] px-8 py-6 border-b border-[rgba(244,123,32,0.1)]">
+          <div className="flex items-start gap-6">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#F47B20] to-amber-400 text-white flex items-center justify-center font-black text-3xl shrink-0 shadow-lg shadow-orange-200">
+              {sitter.fullName?.charAt(0) || "?"}
+            </div>
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold text-[#3A3029] mb-1">{sitter.fullName}</h1>
+              <p className="text-[#857D77] text-sm flex items-center gap-1 mb-3">
+                📍 {sitter.location || "Konum belirtilmemiş"}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <span className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-600 px-3 py-1.5 rounded-full text-sm font-bold">
+                  ★ {sitter.averageRating || "—"} <span className="font-normal text-amber-500">({sitter.totalReviews} yorum)</span>
+                </span>
+                <span className="flex items-center gap-1 bg-[#FFF8F2] border border-[rgba(244,123,32,0.2)] text-[#F47B20] px-3 py-1.5 rounded-full text-sm font-bold">
+                  ₺{sitter.hourlyRate || "—"} <span className="font-normal">/saat</span>
+                </span>
               </div>
             </div>
           </div>
         </div>
+
+        <div className="px-8 py-6">
+          {/* Biyografi */}
+          {sitter.bio && (
+            <div className="mb-6">
+              <h2 className="text-sm font-bold text-[#3A3029] uppercase mb-2 tracking-wider">Hakkında</h2>
+              <p className="text-[#857D77] leading-relaxed">{sitter.bio}</p>
+            </div>
+          )}
+
+          {/* Kabul Edilen Hayvan Türleri */}
+          {sitter.acceptedPetTypes?.length > 0 && (
+            <div className="mb-6">
+              <h2 className="text-sm font-bold text-[#3A3029] uppercase mb-3 tracking-wider">Baktığı Hayvan Türleri</h2>
+              <div className="flex flex-wrap gap-2">
+                {sitter.acceptedPetTypes.map((t) => (
+                  <span key={t} className="flex items-center gap-1.5 bg-[#FFF8F2] border border-[rgba(244,123,32,0.2)] text-[#F47B20] px-4 py-2 rounded-full text-sm font-semibold">
+                    {PET_ICON[t] || "🐾"} {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Kabul Edilen Cinsler */}
+          {sitter.acceptedPetBreeds?.length > 0 && (
+            <div>
+              <h2 className="text-sm font-bold text-[#3A3029] uppercase mb-3 tracking-wider">Uzman Olduğu Cinsler</h2>
+              <div className="flex flex-wrap gap-2">
+                {sitter.acceptedPetBreeds.map((b) => (
+                  <span key={b} className="bg-gray-50 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-full text-sm font-medium">
+                    {b}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Review Submission Section */}
-      <div className="glass-panel p-8">
-        <h2 className="text-2xl font-bold text-[#8B5A2B] mb-6 border-b border-[rgba(139,90,43,0.1)] pb-4">Deneyiminizi Puanlayın</h2>
-        
-        {message && (
-          <div className={`p-4 rounded-xl mb-6 text-sm font-medium ${message.includes('Hata') ? 'bg-[#fee2e2] text-[#b91c1c]' : 'bg-[#dcfce7] text-[#166534]'}`}>
-            {message}
+      {/* Yorum Yazma Formu */}
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 mb-6">
+        <h2 className="text-xl font-bold text-[#8B5A2B] mb-5">⭐ Yorum Bırak</h2>
+
+        {reviewMsg && (
+          <div className={`mb-4 p-4 rounded-xl text-sm font-medium ${
+            reviewMsg.type === "error" ? "bg-red-50 text-red-700 border border-red-200" : "bg-green-50 text-green-700 border border-green-200"
+          }`}>
+            {reviewMsg.text}
           </div>
         )}
 
-        <form onSubmit={handleSubmitReview} className="space-y-6">
+        <form onSubmit={submitReview} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-[#3A3029] mb-3">Bakıcıya Kaç Yıldız Verirsiniz?</label>
-            <div className="flex gap-4">
-              {[1, 2, 3, 4, 5].map(star => (
+            <label className="block text-sm font-bold text-[#3A3029] mb-2">Puanınız</label>
+            <div className="flex gap-1">
+              {[1, 2, 3, 4, 5].map((n) => (
                 <button
-                  key={star}
+                  key={n}
                   type="button"
-                  onClick={() => setRating(star)}
-                  className={`w-12 h-12 rounded-full flex justify-center items-center text-xl transition-all ${rating >= star ? 'bg-[#F47B20] text-white shadow-md transform scale-110' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                  onClick={() => setReviewForm((p) => ({ ...p, rating: n }))}
+                  className={`text-3xl transition-transform hover:scale-110 ${n <= reviewForm.rating ? "text-amber-400" : "text-gray-300"}`}
                 >
                   ★
                 </button>
@@ -130,23 +228,54 @@ export default function SitterDetail({ params }: { params: Promise<{ id: string 
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#3A3029] mb-1">Yorumunuz</label>
-            <textarea 
-              required
-              rows={4} 
-              className="input-field resize-none bg-white/80" 
-              placeholder="Bakıcıyla olan tecrübenizi 1-2 cümle ile anlatın, diğer hayvan sahiplerine yardımcı olun..."
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            ></textarea>
+            <label className="block text-sm font-bold text-[#3A3029] mb-2">Yorumunuz</label>
+            <textarea
+              rows={4}
+              value={reviewForm.comment}
+              onChange={(e) => setReviewForm((p) => ({ ...p, comment: e.target.value }))}
+              placeholder="Bu bakıcıyla deneyiminizi paylaşın..."
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20] resize-none"
+            />
           </div>
 
-          <div className="pt-2">
-            <button type="submit" disabled={loading} className="btn-primary">
-              {loading ? 'Gönderiliyor...' : 'Yorumu Kaydet'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={reviewSaving}
+            className="w-full py-3 bg-[#F47B20] hover:bg-[#d96a15] text-white font-bold rounded-2xl transition-colors disabled:opacity-60"
+          >
+            {reviewSaving ? "Gönderiliyor..." : token ? "Yorum Gönder" : "Yorum için giriş yapın"}
+          </button>
         </form>
+      </div>
+
+      {/* Yorumlar Listesi */}
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
+        <h2 className="text-xl font-bold text-[#8B5A2B] mb-6">
+          💬 Tüm Yorumlar <span className="text-base font-normal text-[#857D77]">({sitter.totalReviews})</span>
+        </h2>
+
+        {sitter.reviews.length === 0 ? (
+          <div className="text-center py-10">
+            <div className="text-4xl mb-2">✨</div>
+            <p className="text-[#857D77]">Henüz yorum yok. İlk yorumu siz yazın!</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {sitter.reviews.map((r) => (
+              <div key={r.id} className="border-b border-gray-50 last:border-0 pb-4 last:pb-0">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="font-semibold text-[#3A3029] text-sm">{r.reviewerName}</span>
+                  <span className="text-amber-500 font-bold text-sm">
+                    {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
+                  </span>
+                </div>
+                {r.comment && (
+                  <p className="text-[#857D77] text-sm leading-relaxed">{r.comment}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -6,6 +6,58 @@ interface Params {
   sitterId: string;
 }
 
+// GET /api/sitters/:sitterId — herkese açık bakıcı profili
+export async function GET(_req: NextRequest, { params }: { params: Promise<Params> }) {
+  try {
+    const { sitterId } = await params;
+
+    const sitter = await prisma.sitterProfile.findUnique({
+      where: { id: sitterId },
+      include: {
+        user: { select: { fullName: true, location: true } },
+        reviewsReceived: {
+          include: {
+            reviewer: { select: { fullName: true } }
+          },
+          orderBy: { id: 'desc' }
+        }
+      }
+    });
+
+    if (!sitter) {
+      return NextResponse.json({ error: 'Bakıcı bulunamadı.' }, { status: 404 });
+    }
+
+    const totalReviews = sitter.reviewsReceived.length;
+    const averageRating = totalReviews > 0
+      ? sitter.reviewsReceived.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+      : 0;
+
+    return NextResponse.json({
+      id: sitter.id,
+      userId: sitter.userId,
+      fullName: sitter.user.fullName,
+      location: sitter.user.location,
+      hourlyRate: sitter.hourlyRate,
+      acceptedPetTypes: sitter.acceptedPetTypes,
+      acceptedPetBreeds: sitter.acceptedPetBreeds,
+      bio: sitter.bio,
+      averageRating: Number(averageRating.toFixed(1)),
+      totalReviews,
+      reviews: sitter.reviewsReceived.map(r => ({
+        id: r.id,
+        rating: r.rating,
+        comment: r.comment,
+        reviewerName: r.reviewer?.fullName || 'Anonim'
+      }))
+    });
+  } catch (error) {
+    console.error('Get sitter error:', error);
+    return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
+  }
+}
+
+
 export async function PUT(req: NextRequest, { params }: { params: Promise<Params> }) {
   try {
     const p = await params;
