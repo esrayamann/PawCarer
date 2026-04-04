@@ -1,141 +1,58 @@
-# Ali Tutar'ın Web Frontend Görevleri
-**Front-end Test Videosu:** [Link buraya eklenecek](https://example.com)
+# Toprak Yavuz'un Web Frontend Görevleri
 
-## 1. Üye Olma (Kayıt) Sayfası
-- **API Endpoint:** `POST /auth/register`
-- **Görev:** Kullanıcı kayıt işlemi için web sayfası tasarımı ve implementasyonu
-- **UI Bileşenleri:**
-  - Responsive kayıt formu (desktop ve mobile uyumlu)
-  - Email input alanı (type="email", autocomplete="email")
-  - Şifre input alanı (type="password", şifre gücü göstergesi)
-  - Şifre tekrar input alanı (doğrulama için)
-  - Ad (firstName) input alanı (autocomplete="given-name")
-  - Soyad (lastName) input alanı (autocomplete="family-name")
-  - "Kayıt Ol" butonu (primary button style)
-  - "Zaten hesabınız var mı? Giriş Yap" linki
-  - Loading spinner (kayıt işlemi sırasında)
-  - Form container (card veya centered layout)
-- **Form Validasyonu:**
-  - HTML5 form validation (required, pattern attributes)
-  - JavaScript real-time validation
-  - Email format kontrolü (regex pattern)
-  - Şifre güvenlik kuralları (min 8 karakter, büyük/küçük harf, rakam)
-  - Şifre eşleşme kontrolü
-  - Ad ve soyad boş olamaz kontrolü
-  - Tüm alanlar geçerli olmadan buton disabled
-  - Client-side ve server-side validation
-- **Kullanıcı Deneyimi:**
-  - Form hatalarını input altında gösterilmesi (inline validation)
-  - Başarılı kayıt sonrası success notification ve otomatik giriş sayfasına yönlendirme
-  - Hata durumlarında kullanıcı dostu mesajlar (409 Conflict: "Bu email zaten kullanılıyor")
-  - Form submission prevention (double-click koruması)
-  - Accessible form labels ve ARIA attributes
-  - Keyboard navigation desteği (Tab, Enter)
-- **Teknik Detaylar:**
-  - Framework: React/Vue/Angular veya Vanilla JS
-  - Form library: React Hook Form, Formik, veya native HTML5
-  - State management (form state, loading state, error state)
-  - Routing (kayıt sayfasından giriş sayfasına geçiş)
-  - SEO optimization (meta tags, structured data)
-  - Accessibility (WCAG 2.1 AA compliance)
+Bu doküman Toprak Yavuz'un sorumluluğundaki UI (Arayüz) gereksinimlerini listelemektedir. Mimari Tailwind CSS ve React/Next.js kullanılarak tasarlanacaktır.
 
-## 2. Kullanıcı Profil Görüntüleme Sayfası
-- **API Endpoint:** `GET /users/{userId}`
-- **Görev:** Kullanıcı profil bilgilerini görüntüleme sayfası tasarımı ve implementasyonu
+## 1. Evcil Hayvan Profili Oluşturma Sayfası
+- **Web Rotası:** `/pets/new`
+- **İlgili API:** `POST /api/pets`
+- **Görev:** Kullanıcının hayvanını sisteme eklemesi için interaktif bir kayıt arayüzü tasarımı.
 - **UI Bileşenleri:**
-  - Responsive profil layout (desktop: sidebar + content, mobile: stacked)
-  - Profil fotoğrafı alanı (circular avatar, placeholder veya gerçek fotoğraf)
-  - Kullanıcı adı ve soyadı (H1 heading)
-  - Email adresi (icon + text, copy to clipboard özelliği)
-  - Telefon numarası (icon + text, varsa)
-  - Hesap oluşturulma tarihi (formatted date)
-  - "Profili Düzenle" butonu (secondary button)
-  - "Hesabı Sil" butonu (danger button, alt kısımda)
-  - Refresh butonu veya auto-refresh
-  - Breadcrumb navigation (opsiyonel)
+  - Responsive geniş form kartı (Form container).
+  - İsim girdisi (`name`).
+  - Hayvan tipi açılır menüsü (Kedi, Köpek, Kuş vb).
+  - Cins girdisi (Dinamik text veya dropdown).
+  - Yaş (Number input).
+  - Özel notlar alanı (Textarea).
+  - "Profili Oluştur" (Primary Submit Button).
 - **Kullanıcı Deneyimi:**
-  - Loading skeleton screen (veri yüklenirken)
-  - Empty state (veri yoksa)
-  - Error state (yükleme hatası durumunda retry butonu)
-  - Smooth page transitions
-  - Profil fotoğrafı için placeholder avatar (initials)
-  - Responsive grid layout
-  - Print-friendly styles
-- **Teknik Detaylar:**
-  - Lazy loading images (profil fotoğrafları için)
-  - Image optimization (WebP format, responsive images)
-  - Client-side caching (localStorage/sessionStorage)
-  - State management (user data, loading, error states)
-  - Routing (profil düzenleme sayfasına geçiş)
-  - Deep linking desteği (profil paylaşımı için)
-  - Meta tags (Open Graph, Twitter Cards)
+  - Hatalı form teslimleri için Inline-validation (eksik zorunlu alan uyarıları).
+  - Form verisi kaydedilirken dönen Loading icon ve işlemi engelleme durumu (disabled button).
+  - İşlem başarılı olunca sayfa başında beliren başarı göstergesi (Toast / Alert).
 
-## 3. Kullanıcı Profil Düzenleme Sayfası
-- **API Endpoint:** `PUT /users/{userId}`
-- **Görev:** Kullanıcı profil bilgilerini düzenleme sayfası tasarımı ve implementasyonu
+## 2. Gelişmiş Bakıcı Arama ve Filtreleme Sayfası
+- **Web Rotası:** `/search`
+- **İlgili API:** `GET /api/sitters` (Query Parametreleri ile)
+- **Görev:** Hayvan sahiplerinin istedikleri özelliklere uygun bakıcıları listeleyebileceği vitrin sayfası.
 - **UI Bileşenleri:**
-  - Responsive düzenleme formu
-  - Profil fotoğrafı düzenleme alanı (drag & drop upload, preview)
-  - Ad (firstName) input alanı (mevcut değerle dolu)
-  - Soyad (lastName) input alanı (mevcut değerle dolu)
-  - Email input alanı (mevcut değerle dolu, düzenlenebilir)
-  - Telefon numarası input alanı (mevcut değerle dolu, format maskesi)
-  - "Kaydet" butonu (primary button, sağ üst veya form altında)
-  - "İptal" butonu (secondary button, sol üst veya form altında)
-  - Değişiklik yapıldığında "Kaydet" butonu aktif olur
-  - Unsaved changes indicator
-- **Form Validasyonu:**
-  - Email format kontrolü (real-time)
-  - Telefon numarası format kontrolü (ülke kodu desteği, input masking)
-  - Real-time validation feedback
-  - Değişiklik yoksa "Kaydet" butonu disabled
-  - File upload validation (image type, size limits)
+  - Sayfa başında Konum (Location) metin araması barı.
+  - Yan menüde (veya üst kısımda dropdown olarak) Tür ve Cins filtreleri (Kedi, Köpek, Golden vb.).
+  - Filtrele butonu.
+  - "Bakıcılar" Grid (Izgara) Layout (Mobile: List, Desktop: Grid).
+  - Her bir satır/kutu içerisinde "Sitter Card" bileşenleri (Ad, Soyad, Bio, Ücret, Kabul Ettiği Türler).
+  - Bakıcı yıldızı (`averageRating`) ve toplam oy göstergesi componentleri.
 - **Kullanıcı Deneyimi:**
-  - Optimistic update (kaydet butonuna basıldığında UI anında güncellenir)
-  - Başarılı güncelleme sonrası success notification (toast/snackbar)
-  - Hata durumunda error mesajı ve değişiklikler geri alınır
-  - "İptal" butonuna basıldığında değişiklik kaybı için browser confirmation dialog
-  - Beforeunload event (sayfa kapatılırken uyarı)
-  - Image preview (upload öncesi)
-  - Progress indicator (image upload için)
-- **Teknik Detaylar:**
-  - Form state management (initial values, edited values, dirty state)
-  - File upload component (drag & drop, file picker)
-  - Image compression (client-side, before upload)
-  - Image preview functionality
-  - Routing (geri dönüş, kaydetme sonrası profil sayfasına dönüş)
-  - Unsaved changes warning (browser navigation)
-  - Form persistence (localStorage, draft saving)
+  - Filtresiz ilk girişte tüm sonuçların ekrana basılması (Eğer data yoksa "Bakıcı Bulunamadı" sayfası/görseli).
+  - Arama butonuna basınca skeleton-loading ekranı ve yumuşak geçiş efektleri (Modern hover tasarımları).
 
-## 4. Hesap Silme Akışı
-- **API Endpoint:** `DELETE /users/{userId}`
-- **Görev:** Kullanıcı hesabını silme işlemi için web UI akışı tasarımı ve implementasyonu
+## 3. Admin Kontrol Paneli (Dashboard)
+- **Web Rotası:** `/admin`
+- **İlgili API'ler:** `DELETE /api/admin/reviews`, `DELETE /api/admin/sitters`, `PUT /api/admin/users/role`
+- **Görev:** Yetkili (Admin) hesaplara özel kuralları ihlal eden kişileri ve içerikleri düzenleme merkezi.
 - **UI Bileşenleri:**
-  - "Hesabı Sil" butonu (profil sayfasında, danger button style)
-  - Modal dialog (destructive action için)
-  - Şifre doğrulama alanı (güvenlik için opsiyonel)
-  - Son onay ekranı (uyarı mesajları ile)
-  - "Emin misiniz?" confirmation dialog (çift onay mekanizması)
-  - Warning icons ve visual cues
+  - Sade, okunaklı Tailwind data tabloları (Kullanıcılar Tablosu, Bakıcılar Tablosu, Yorumlar Tablosu).
+  - Seçili kullanıcının Rolünü değiştirebilmeyi sağlayan küçük 'Dropdown' (Select) yapısı.
+  - Yorum/Bakıcı silmek için kırmızı (Danger) "Çöp Kutusu" ikonu butonu.
+  - Güvenlik uyarı Modalı (Are you sure you want to delete?).
 - **Kullanıcı Deneyimi:**
-  - Destructive action için görsel uyarılar (kırmızı renk, warning icons)
-  - Açık ve net uyarı mesajları ("Bu işlem geri alınamaz")
-  - İptal seçeneği her zaman mevcut (modal close, cancel button)
-  - Silme işlemi sırasında loading indicator
-  - Başarılı silme sonrası logout ve login sayfasına yönlendirme
-  - Success message gösterilmesi
-- **Akış Adımları:**
-  1. Profil sayfasında "Hesabı Sil" butonuna tıklama
-  2. İlk uyarı modal dialog'u gösterilmesi
-  3. Onaylandığında şifre doğrulama (opsiyonel)
-  4. Son onay ekranı (detaylı uyarılar, checkbox confirmation)
-  5. Silme işlemi gerçekleştirme
-  6. Başarılı silme sonrası logout ve login sayfasına yönlendirme
-- **Teknik Detaylar:**
-  - Modal/Dialog component kullanımı
-  - Multi-step flow yönetimi (state machine veya step-based)
-  - Error handling (silme başarısız olursa)
-  - Logout işlemi entegrasyonu
-  - Session storage ve localStorage temizleme
-  - Redirect handling (login sayfasına dönüş)
-  - Browser history management
+  - Yalnızca "ADMIN" olarak yetki almış hesapların bu paneli görebilmesi, yetkisiz ise giriş sayfasına "Access Denied" ile atılması.
+  - Veri silinirken veya güncellenirken optimistic update uygulanarak ekrandan anında kaldırılması veya başarı bildirimi.
+
+## 4. Kullanıcı Yorum Güncelleme Modalı/Formu
+- **Web Rotası:** Kullanıcının asıl profil detayında (veya ayrı bir route'da) açılacak diyalog.
+- **İlgili API:** `PUT /api/reviews/{reviewId}`
+- **Görev:** Kullanıcının geçmişteki deneyim puanını değiştirebilme hakkı.
+- **UI Bileşenleri:**
+  - CSS/Tailwind ile hazırlanmış basit bir Modal penceresi.
+  - Tıklanabilir 5'li Yıldız Sistemi componenti (Rating Widget).
+  - Yorum açıklama alanı (Textarea).
+  - "Değişiklikleri Kaydet" ve "Vazgeç" (Cancel) Butonları.
