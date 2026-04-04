@@ -1,0 +1,316 @@
+{
+  "info": {
+    "name": "Paw-Carer - Toprak Yavuz API Testleri",
+    "description": "PawCarer backend projesindeki Toprak Yavuz gereksinimleri için API test koleksiyonu.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Evcil Hayvan İşlemleri",
+      "item": [
+        {
+          "name": "1. Evcil Hayvan Profili Oluşturma (Req 9)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Oreo\",\n  \"petType\": \"Kedi\",\n  \"breed\": \"British Shorthair\",\n  \"age\": 2,\n  \"notes\": \"Çok uysal bir kedi.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "pets"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Bakıcı Arama/Filtreleme İşlemleri",
+      "item": [
+        {
+          "name": "2. Konuma Göre Arama Yapılması (Req 10)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sitters?location={{searchLocation}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sitters"
+              ],
+              "query": [
+                {
+                  "key": "location",
+                  "value": "{{searchLocation}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Hayvan Türüne Göre Filtreleme (Req 11)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sitters?petType={{searchPetType}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sitters"
+              ],
+              "query": [
+                {
+                  "key": "petType",
+                  "value": "{{searchPetType}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. Hayvan Cinsine Göre Filtreleme (Req 12)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sitters?petBreed={{searchPetBreed}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sitters"
+              ],
+              "query": [
+                {
+                  "key": "petBreed",
+                  "value": "{{searchPetBreed}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Yönetici (Admin) İşlemleri",
+      "item": [
+        {
+          "name": "5. Admin Yorum Silme (Req 13)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAuthToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/reviews/{{reviewId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "reviews",
+                "{{reviewId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "6. Admin Bakıcı Silme (Req 14)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAuthToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/sitters/{{sitterId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "sitters",
+                "{{sitterId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Admin Yetkilendirme (Rol Değiştirme) (Req 15)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAuthToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"SITTER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/{{targetUserId}}/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "{{targetUserId}}",
+                "role"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Yorum Yönetimi",
+      "item": [
+        {
+          "name": "8. Kullanıcı Yorum Güncelleme (Req 16)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Fikrimi değiştirdim, genel olarak gayet iyi bir bakım sağladı.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{reviewId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "{{reviewId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://paw-carer.vercel.app",
+      "type": "string",
+      "description": "paw-carer.vercel.app"
+    },
+    {
+      "key": "authToken",
+      "value": "BURAYA_GIRIS_YAPAN_OWNER_TOKENI_GELECEK",
+      "type": "string"
+    },
+    {
+      "key": "adminAuthToken",
+      "value": "BURAYA_ADMIN_ROLUNE_SAHIP_KULLANICI_TOKENI_GELECEK",
+      "type": "string"
+    },
+    {
+      "key": "searchLocation",
+      "value": "İstanbul",
+      "type": "string"
+    },
+    {
+      "key": "searchPetType",
+      "value": "Kedi",
+      "type": "string"
+    },
+    {
+      "key": "searchPetBreed",
+      "value": "British Shorthair",
+      "type": "string"
+    },
+    {
+      "key": "reviewId",
+      "value": "SILINECEK_VEYA_GUNCELLENECEK_YORUM_ID",
+      "type": "string"
+    },
+    {
+      "key": "sitterId",
+      "value": "SILINECEK_BAKICI_ID",
+      "type": "string"
+    },
+    {
+      "key": "targetUserId",
+      "value": "ROLU_DEGISTIRILECEK_KULLANICININ_IDSI",
+      "type": "string"
+    }
+  ]
+}
