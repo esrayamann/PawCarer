@@ -2,11 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getUserIdFromRequest } from "@/lib/auth";
 
+// GET /api/pets — oturum açmış kullanıcının petlerini döner
+export async function GET(req: NextRequest) {
+  try {
+    const ownerId = getUserIdFromRequest(req);
+    if (!ownerId) {
+      return NextResponse.json({ error: "Giriş yapmanız gerekiyor." }, { status: 401 });
+    }
+
+    const pets = await prisma.pet.findMany({
+      where: { ownerId },
+      orderBy: { id: "asc" },
+    });
+
+    return NextResponse.json(pets);
+  } catch (error: any) {
+    console.error("Petler yüklenirken hata:", error);
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
+  }
+}
+
+// POST /api/pets — yeni pet oluştur
 export async function POST(req: NextRequest) {
   try {
-    // 1. Kullanıcıyı Authenticate (Kimlik Doğrulama) et
     const ownerId = getUserIdFromRequest(req);
-    
+
     if (!ownerId) {
       return NextResponse.json(
         { error: "Kayıt bulunamadı. Lütfen giriş yapın." },
@@ -14,7 +34,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Gerçek bir kullanıcı var mı kontrol et (Test ve Demo için opsiyonel)
     const existingUser = await prisma.user.findUnique({
       where: { id: ownerId }
     });
@@ -26,11 +45,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Request body'i parse et
     const body = await req.json();
     const { name, petType, breed, age, notes } = body;
 
-    // 3. Basit validasyon
     if (!name || !petType || !breed) {
       return NextResponse.json(
         { error: "'name', 'petType' ve 'breed' alanları zorunludur." },
@@ -38,7 +55,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. Veritabanında (Prisma) yeni pet kaydını oluştur
     const newPet = await prisma.pet.create({
       data: {
         ownerId: ownerId,
@@ -50,7 +66,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 5. 201 Created formatında yanıt dön (API Tasarımıyla aynı)
     return NextResponse.json(newPet, { status: 201 });
 
   } catch (error: any) {
