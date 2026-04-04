@@ -2,6 +2,8 @@
 
 **API Test Postman:** `PawCarer_Toprak_Yavuz_Postman.json`
 
+**API Test Videosu:** [Toprak Yavuz Gereksinimler API Test Videosu](https://youtu.be/eDMo8-ExUlM)  
+
 ## 1. Evcil Hayvan Profili Oluşturma
 - **Endpoint:** `POST /api/pets`
 - **Görev:** Kullanıcının (Owner) kendine ait bir evcil hayvan profili yaratması.
