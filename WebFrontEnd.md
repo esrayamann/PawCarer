@@ -10,6 +10,7 @@ Bu dokümanda, web uygulamasının kullanıcı arayüzü (UI) ve kullanıcı den
 
 1. [Ali Tutar'ın Web Frontend Görevleri](Ali-Tutar/Ali-Tutar-Web-Frontend-Gorevleri.md)
 2. [Esra Yaman'ın Web Frontend Görevleri](Esra-Yaman/Esra-Yaman-Web-Frontend-Gorevleri.md)
+3. [Toprak Yavuz'un Web Frontend Görevleri](Toprak-Yavuz/Toprak-Yavuz-Web-Frontend-Gorevleri.md)
 
 
 

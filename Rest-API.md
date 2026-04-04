@@ -10,4 +10,5 @@ Bu dokümanda, proje ekibindeki her üyenin geliştirmekten sorumlu olduğu REST
 
 1. [Ali Tutar'ın REST API Metotları](Ali-Tutar/Ali-Tutar-Rest-API-Gorevleri.md)
 2. [Esra Yaman'ın REST API Metotları](Esra-Yaman/Esra-Yaman-Rest-API-Gorevleri.md)
+3. [Toprak Yavuz'un REST API Metotları](Toprak-Yavuz/Toprak-Yavuz-Rest-API-Gorevleri.md)
 
