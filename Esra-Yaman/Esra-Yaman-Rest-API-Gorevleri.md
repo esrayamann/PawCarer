@@ -1,9 +1,8 @@
 # Esra Yaman REST API Görevleri
 
 **REST API Domain Adresi:** `https://paw-carer.vercel.app/api`
-**API Test Videosu:** [Ödev Videosu Linkini Buraya Ekleyiniz](https://youtube.com/...)
+**API Test Videosu:** [Esra Yaman API Test Videosu](https://youtu.be/FhMVdk3_usM)
 
----
 
 ## 1. Hayvan Sahibi (Owner) Kaydı
 - **Endpoint:** `POST /api/auth/register/owner`
