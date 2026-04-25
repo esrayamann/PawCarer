@@ -16,9 +16,13 @@ import { Input } from '../../../components/ui/Input';
 import { Colors, Typography, Spacing, BorderRadius } from '../../../constants/theme';
 
 export default function EditReviewScreen() {
-  const { reviewId } = useLocalSearchParams<{ reviewId: string }>();
-  const [rating, setRating] = useState(3);
-  const [comment, setComment] = useState('');
+  const { reviewId, initialRating, initialComment } = useLocalSearchParams<{
+    reviewId: string;
+    initialRating?: string;
+    initialComment?: string;
+  }>();
+  const [rating, setRating] = useState(initialRating ? parseInt(initialRating) : 3);
+  const [comment, setComment] = useState(initialComment || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
