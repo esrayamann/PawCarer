@@ -1,5 +1,9 @@
-# Ali Tutar'ın Mobil Frontend Görevleri
+# Toprak Yavuz'un Mobil Frontend Görevleri
 **Mobile Front-end Demo Videosu:** [Link buraya eklenecek](https://example.com)
+
+**Proje Dizini:** `PawCarer/mobile/`  
+**Framework:** Expo (React Native) + TypeScript  
+**Çalıştırma:** `cd mobile && npx expo start`
 
 ## 1. Üye Olma (Kayıt) Ekranı
 - **API Endpoint:** `POST /auth/register`

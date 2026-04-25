@@ -1,5 +1,9 @@
-# Ali Tutar'ın Mobil Backend Görevleri
+# Toprak Yavuz'un Mobil Backend Görevleri
 **Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek]()
+
+**API Base URL:** `https://paw-carer.vercel.app/api`  
+**HTTP Client:** axios + JWT interceptor (`mobile/services/apiClient.ts`)  
+**Token Saklama:** expo-secure-store (`pawcarer_jwt` key)
 
 ## 1. Üye Olma (Kayıt) Servisi
 - **API Endpoint:** `POST /auth/register`

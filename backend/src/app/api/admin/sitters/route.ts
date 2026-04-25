@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
           select: { fullName: true, email: true, location: true },
         },
         _count: {
-          select: { reviews: true },
+          select: { reviewsReceived: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
       email: s.user?.email,
       location: s.user?.location,
       hourlyRate: s.hourlyRate,
-      totalReviews: s._count.reviews,
+      totalReviews: s._count.reviewsReceived,
     }));
 
     return NextResponse.json(formatted, { status: 200 });
