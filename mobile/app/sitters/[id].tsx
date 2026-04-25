@@ -246,9 +246,30 @@ export default function SitterDetailScreen() {
               <View key={r.id} style={[styles.reviewItem, idx < sitter.reviews.length - 1 && styles.reviewDivider]}>
                 <View style={styles.reviewHeader}>
                   <Text style={styles.reviewerName}>{r.reviewerName || 'Anonim'}</Text>
-                  <Text style={styles.reviewStars}>
-                    {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
-                  </Text>
+                  <View style={styles.reviewHeaderRight}>
+                    <Text style={styles.reviewStars}>
+                      {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
+                    </Text>
+                    {/* Kendi yorumuna düzenle butonu */}
+                    {user && r.reviewerId === user.id && (
+                      <TouchableOpacity
+                        style={styles.editReviewBtn}
+                        onPress={() =>
+                          router.push({
+                            pathname: '/reviews/[reviewId]/edit',
+                            params: {
+                              reviewId: r.id,
+                              initialRating: String(r.rating),
+                              initialComment: r.comment || '',
+                            },
+                          })
+                        }
+                      >
+                        <Ionicons name="pencil-outline" size={14} color={Colors.secondary} />
+                        <Text style={styles.editReviewBtnText}>Düzenle</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </View>
                 {r.comment ? <Text style={styles.reviewComment}>{r.comment}</Text> : null}
               </View>
@@ -459,4 +480,12 @@ const styles = StyleSheet.create({
   reviewerName: { color: Colors.textPrimary, fontSize: Typography.fontSize.sm, fontWeight: Typography.fontWeight.semibold },
   reviewStars: { color: '#F59E0B', fontSize: Typography.fontSize.sm, fontWeight: Typography.fontWeight.bold },
   reviewComment: { color: Colors.textSecondary, fontSize: Typography.fontSize.sm, lineHeight: 20 },
+  reviewHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  editReviewBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 3,
+    backgroundColor: Colors.surfaceHigh, borderRadius: BorderRadius.full,
+    paddingHorizontal: Spacing.sm, paddingVertical: 3,
+    borderWidth: 1, borderColor: 'rgba(244,123,32,0.25)',
+  },
+  editReviewBtnText: { color: Colors.secondary, fontSize: Typography.fontSize.xs, fontWeight: Typography.fontWeight.semibold },
 });

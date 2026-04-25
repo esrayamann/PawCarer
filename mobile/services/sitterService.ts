@@ -15,6 +15,7 @@ export interface SitterResponse {
 
 export interface Review {
   id: string;
+  reviewerId?: string;
   rating: number;
   comment: string;
   reviewerName?: string;

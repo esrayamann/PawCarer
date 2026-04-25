@@ -46,6 +46,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<Param
       totalReviews,
       reviews: sitter.reviewsReceived.map(r => ({
         id: r.id,
+        reviewerId: r.reviewerId,
         rating: r.rating,
         comment: r.comment,
         reviewerName: r.reviewer?.fullName || 'Anonim'
