@@ -32,6 +32,15 @@ export interface SitterSearchParams {
   petBreed?: string;
 }
 
+
+export interface SitterUpdatePayload {
+  hourlyRate?: number;
+  acceptedPetTypes?: string[];
+  acceptedPetBreeds?: string[];
+  bio?: string;
+}
+
+
 export const sitterService = {
   searchSitters: async (params: SitterSearchParams): Promise<SitterResponse[]> => {
     const response = await apiClient.get<SitterResponse[]>('/sitters', { params });
@@ -42,6 +51,27 @@ export const sitterService = {
     const response = await apiClient.get<SitterDetail>(`/sitters/${sitterId}`);
     return response.data;
   },
+
+  // Kullanıcının kendi bakıcı profilini userId üzerinden getirir
+  getMySitterProfile: async (userId: string): Promise<SitterDetail | null> => {
+    // Tüm bakıcıları çekip userId'ye göre filtrele
+    const response = await apiClient.get<SitterResponse[]>('/sitters');
+    const all = response.data;
+    const mine = all.find((s) => s.userId === userId);
+    if (!mine) return null;
+    // Detayları getir
+    const detail = await apiClient.get<SitterDetail>(`/sitters/${mine.id}`);
+    return detail.data;
+  },
+
+  updateSitter: async (
+    sitterId: string,
+    payload: SitterUpdatePayload
+  ): Promise<SitterResponse> => {
+    const response = await apiClient.put<SitterResponse>(`/sitters/${sitterId}`, payload);
+    return response.data;
+  },
+
 
   addReview: async (
     sitterId: string,

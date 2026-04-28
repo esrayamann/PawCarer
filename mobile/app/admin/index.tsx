@@ -136,6 +136,30 @@ export default function AdminScreen() {
     );
   };
 
+  // ── Kullanıcı silme ──
+  const handleDeleteUser = (userId: string, userName: string) => {
+    Alert.alert(
+      'Kullanıcıyı Sil',
+      `"${userName}" adlı kullanıcıyı kalıcı olarak silmek istiyor musunuz?\n\nBu işlem geri alınamaz.`,
+      [
+        { text: 'Vazgeç', style: 'cancel' },
+        {
+          text: 'Evet, Sil',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await adminService.deleteUser(userId);
+              setUsers((prev) => prev.filter((u) => u.id !== userId));
+            } catch (err: any) {
+              Alert.alert('Hata', err?.response?.data?.message || 'Kullanıcı silinemedi.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+
   // ── Rol güncelleme ──
   const handleRoleChange = (userId: string, userName: string, newRole: 'OWNER' | 'SITTER' | 'ADMIN') => {
     const roleLabel: Record<string, string> = { OWNER: 'Hayvan Sahibi', SITTER: 'Bakıcı', ADMIN: 'Yönetici' };
@@ -249,8 +273,8 @@ export default function AdminScreen() {
         ))
       )}
 
-      {/* ─── KULLANICI ROL YÖNETİMİ ─── */}
-      <SectionHeader title="Kullanıcı Rolleri" icon="key-outline" />
+      {/* ─── KULLANICI YÖNETİMİ ─── */}
+      <SectionHeader title="Kullanıcılar" icon="people-outline" />
       {users.length === 0 ? (
         <EmptyState message="Kullanıcı bulunamadı" />
       ) : (
@@ -273,7 +297,7 @@ export default function AdminScreen() {
                 </View>
               </View>
             </View>
-            {/* Rol butonları */}
+            {/* Rol butonları + Sil */}
             <View style={styles.roleBtnRow}>
               {(['OWNER', 'SITTER', 'ADMIN'] as const)
                 .filter((r) => r !== u.role)
@@ -288,6 +312,13 @@ export default function AdminScreen() {
                     </Text>
                   </TouchableOpacity>
                 ))}
+              <TouchableOpacity
+                style={styles.deleteUserBtn}
+                onPress={() => handleDeleteUser(u.id, u.fullName ?? u.email)}
+              >
+                <Ionicons name="trash-outline" size={13} color="#fff" />
+                <Text style={styles.deleteUserBtnText}>Sil</Text>
+              </TouchableOpacity>
             </View>
           </View>
         ))
@@ -422,6 +453,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm, paddingVertical: 4,
   },
   roleBtnText: { fontSize: Typography.fontSize.xs, fontWeight: Typography.fontWeight.semibold },
+  deleteUserBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 3,
+    backgroundColor: Colors.error, borderRadius: BorderRadius.full,
+    paddingHorizontal: Spacing.sm, paddingVertical: 4,
+  },
+  deleteUserBtnText: {
+    color: '#fff', fontSize: Typography.fontSize.xs, fontWeight: Typography.fontWeight.bold,
+  },
 
   // Access denied
   denied: {

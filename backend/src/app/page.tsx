@@ -27,7 +27,7 @@ export default function Home() {
       {/* Main Features Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 max-w-6xl mx-auto w-full z-10 mb-20">
         
-        {/* Hayvan Sahipleri (Esra/Toprak Mix) */}
+        {/* Hayvan Sahipleri */}
         <div className="glass-panel p-8 flex flex-col items-center text-center transform transition-all hover:-translate-y-2 hover:shadow-xl">
           <div className="text-6xl mb-4">🐶</div>
           <h2 className="text-2xl font-bold text-[#3A3029] mb-2 bg-[#F47B20] text-white px-4 py-1 rounded-full shadow-sm">
@@ -43,13 +43,13 @@ export default function Home() {
             <Link href="/pets/new" className="px-4 py-2 text-[#79B851] font-semibold bg-[rgba(121,184,81,0.1)] rounded-full hover:bg-[rgba(121,184,81,0.2)] transition-colors">
               🐱 Evcil Hayvan Ekle
             </Link>
-            <Link href="/search" className="px-4 py-2 text-[#F47B20] font-semibold bg-[rgba(244,123,32,0.1)] rounded-full hover:bg-[rgba(244,123,32,0.2)] transition-colors">
+            <Link href="/sitters" className="px-4 py-2 text-[#F47B20] font-semibold bg-[rgba(244,123,32,0.1)] rounded-full hover:bg-[rgba(244,123,32,0.2)] transition-colors">
               🔍 Konuma Göre Bakıcı Ara
             </Link>
           </div>
         </div>
 
-        {/* Bakıcılar (Esra) */}
+        {/* Bakıcılar */}
         <div className="glass-panel p-8 flex flex-col items-center text-center transform transition-all hover:-translate-y-2 hover:shadow-xl">
           <div className="text-6xl mb-4">🙋‍♂️</div>
           <h2 className="text-2xl font-bold text-[#3A3029] mb-2 bg-[#2F79A8] text-white px-4 py-1 rounded-full shadow-sm">
@@ -68,7 +68,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Güvenlik & Admin (Esra/Toprak) */}
+        {/* Güvenlik & Admin */}
         <div className="glass-panel p-8 flex flex-col items-center text-center transform transition-all hover:-translate-y-2 hover:shadow-xl md:col-span-2 lg:col-span-1">
           <div className="text-6xl mb-4">🛡️</div>
           <h2 className="text-2xl font-bold text-[#3A3029] mb-2 bg-[#8B5A2B] text-white px-4 py-1 rounded-full shadow-sm">

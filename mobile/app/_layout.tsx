@@ -36,6 +36,10 @@ export default function RootLayout() {
           options={{ title: 'Yorumu Düzenle', presentation: 'modal' }}
         />
         <Stack.Screen
+          name="sitter/edit"
+          options={{ title: 'Bakıcı Profilimi Düzenle', presentation: 'modal' }}
+        />
+        <Stack.Screen
           name="sitters/[id]"
           options={{ title: 'Bakıcı Profili' }}
         />

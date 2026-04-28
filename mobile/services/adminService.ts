@@ -12,6 +12,11 @@ export const adminService = {
     await apiClient.delete(`/admin/sitters/${sitterId}`);
   },
 
+  deleteUser: async (userId: string): Promise<void> => {
+    await apiClient.delete(`/admin/users/${userId}`);
+  },
+
+
   updateUserRole: async (userId: string, role: UserRole): Promise<UserInfo> => {
     const response = await apiClient.put<UserInfo>(`/admin/users/${userId}/role`, { role });
     return response.data;

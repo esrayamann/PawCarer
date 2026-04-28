@@ -110,6 +110,17 @@ export default function ProfileScreen() {
           style={styles.actionBtn}
         />
 
+        {user?.role === 'SITTER' && (
+          <Button
+            title="🐾 Bakıcı Profilimi Düzenle"
+            onPress={() => router.push('/sitter/edit' as any)}
+            variant="ghost"
+            size="lg"
+            style={styles.actionBtn}
+          />
+        )}
+
+
         {user?.role === 'OWNER' && (
           <Button
             title="🐾 Hayvan Ekle"
