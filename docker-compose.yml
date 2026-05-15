@@ -1,0 +1,72 @@
+# PawCarer — Docker Compose
+# Backend + Redis (cache) + RabbitMQ (mesaj kuyruğu) servisleri
+
+services:
+  # ─── Backend (Next.js + Prisma) ───
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pawcarer-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - DIRECT_URL=${DIRECT_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pawcarer-network
+    restart: unless-stopped
+
+  # ─── Redis (Cache) ───
+  redis:
+    image: redis:7-alpine
+    container_name: pawcarer-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pawcarer-network
+    restart: unless-stopped
+
+  # ─── RabbitMQ (Mesaj Kuyruğu) ───
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: pawcarer-rabbitmq
+    ports:
+      - "5672:5672"     # AMQP protokolü
+      - "15672:15672"   # Yönetim paneli (Web UI)
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - pawcarer-network
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+  rabbitmq-data:
+
+networks:
+  pawcarer-network:
+    driver: bridge

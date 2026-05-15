@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { publishMessage, QUEUES } from '@/lib/rabbitmq';
 
 export async function POST(req: Request) {
   try {
@@ -61,6 +62,16 @@ export async function POST(req: Request) {
 
     // UI'a veya Postman'e şifreyi geri döndürme
     const { password: _, ...userWithoutPassword } = newUser;
+
+    // ─── RabbitMQ: Kullanıcı kaydı bildirimi ───
+    await publishMessage(QUEUES.USER_REGISTERED, {
+      event: 'user_registered',
+      userId: newUser.id,
+      email: newUser.email,
+      fullName: newUser.fullName,
+      role: newUser.role,
+      location: newUser.location || null,
+    });
 
     return NextResponse.json(userWithoutPassword, { status: 201 });
   } catch (error) {

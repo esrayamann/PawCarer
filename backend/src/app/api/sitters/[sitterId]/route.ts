@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getUserIdFromRequest } from '@/lib/auth';
+import { cacheGet, cacheSet, cacheDel, cacheClearPattern } from '@/lib/redis';
 
 interface Params {
   sitterId: string;
@@ -10,6 +11,13 @@ interface Params {
 export async function GET(_req: NextRequest, { params }: { params: Promise<Params> }) {
   try {
     const { sitterId } = await params;
+
+    // ─── Redis Cache Kontrolü ───
+    const cacheKey = `sitters:detail:${sitterId}`;
+    const cached = await cacheGet<any>(cacheKey);
+    if (cached) {
+      return NextResponse.json(cached, { status: 200 });
+    }
 
     const sitter = await prisma.sitterProfile.findUnique({
       where: { id: sitterId },
@@ -33,7 +41,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<Param
       ? sitter.reviewsReceived.reduce((sum, r) => sum + r.rating, 0) / totalReviews
       : 0;
 
-    return NextResponse.json({
+    const responseData = {
       id: sitter.id,
       userId: sitter.userId,
       fullName: sitter.user.fullName,
@@ -51,7 +59,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<Param
         comment: r.comment,
         reviewerName: r.reviewer?.fullName || 'Anonim'
       }))
-    });
+    };
+
+    // ─── Sonucu Redis'e cache'le (60 saniye) ───
+    await cacheSet(cacheKey, responseData, 60);
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error('Get sitter error:', error);
     return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
@@ -97,6 +110,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<Params
         ...(bio !== undefined && { bio }),
       }
     });
+
+    // ─── Cache Invalidation: güncelleme sonrası eski cache'i temizle ───
+    await cacheDel(`sitters:detail:${sitterId}`);
+    await cacheClearPattern('sitters:list:*');
 
     return NextResponse.json(updatedSitter, { status: 200 });
 

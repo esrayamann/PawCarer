@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getUserIdFromRequest } from '@/lib/auth';
+import { publishMessage, QUEUES } from '@/lib/rabbitmq';
+import { cacheDel, cacheClearPattern } from '@/lib/redis';
 
 interface Params {
   sitterId: string;
@@ -47,6 +49,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<Param
         comment
       }
     });
+
+    // ─── RabbitMQ: Yeni yorum bildirimi ───
+    await publishMessage(QUEUES.REVIEW_CREATED, {
+      event: 'review_created',
+      reviewId: newReview.id,
+      sitterId,
+      reviewerId: authenticatedId,
+      rating,
+      comment: comment || '',
+    });
+
+    // ─── Redis: Bakıcı cache'ini temizle (ortalama puan değişti) ───
+    await cacheDel(`sitters:detail:${sitterId}`);
+    await cacheClearPattern('sitters:list:*');
 
     return NextResponse.json(newReview, { status: 201 });
 

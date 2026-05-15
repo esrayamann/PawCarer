@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { cacheGet, cacheSet } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -8,6 +9,13 @@ export async function GET(req: NextRequest) {
   const location = searchParams.get("location");
   const petType = searchParams.get("petType");
   const petBreed = searchParams.get("petBreed");
+
+  // ─── Redis Cache Kontrolü ───
+  const cacheKey = `sitters:list:${location || 'all'}:${petType || 'all'}:${petBreed || 'all'}`;
+  const cached = await cacheGet<any[]>(cacheKey);
+  if (cached) {
+    return NextResponse.json(cached, { status: 200 });
+  }
 
   // Prisma sorgusu için dinamik where koşulu
   let whereClause: any = {};
@@ -64,6 +72,9 @@ export async function GET(req: NextRequest) {
         totalReviews: totalReviews
       };
     });
+
+    // ─── Sonuçları Redis'e cache'le (60 saniye) ───
+    await cacheSet(cacheKey, enrichedSitters, 60);
 
     return NextResponse.json(enrichedSitters, { status: 200 });
 
