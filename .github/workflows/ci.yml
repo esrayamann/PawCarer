@@ -84,8 +84,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: mobile/package-lock.json
 
       - name: 📦 Install mobile dependencies
         working-directory: ./mobile
