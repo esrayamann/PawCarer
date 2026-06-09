@@ -10,6 +10,7 @@ let channel: amqplib.Channel | null = null;
 export const QUEUES = {
   USER_REGISTERED: 'user_registered',
   REVIEW_CREATED: 'review_created',
+  REVIEW_UPDATED: 'review_updated',   // Toprak Yavuz — Gereksinim 16: Kullanıcı Yorum Güncelleme
   NOTIFICATION: 'notification',
 } as const;
 
@@ -28,6 +29,7 @@ async function getChannel(): Promise<amqplib.Channel | null> {
     // Kuyrukları tanımla (idempotent — zaten varsa hata vermez)
     await channel.assertQueue(QUEUES.USER_REGISTERED, { durable: true });
     await channel.assertQueue(QUEUES.REVIEW_CREATED, { durable: true });
+    await channel.assertQueue(QUEUES.REVIEW_UPDATED, { durable: true });
     await channel.assertQueue(QUEUES.NOTIFICATION, { durable: true });
 
     console.log('[RabbitMQ] ✅ Bağlantı ve kuyruklar hazır');

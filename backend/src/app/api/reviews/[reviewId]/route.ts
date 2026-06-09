@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getUserIdFromRequest } from "@/lib/auth";
+import { publishMessage, QUEUES } from "@/lib/rabbitmq";
 
 export async function PUT(
   req: NextRequest,
@@ -20,7 +21,7 @@ export async function PUT(
     // 2. Yorumun veritabanında var olup olmadığını ve sahipliğini kontrol et
     const review = await prisma.review.findUnique({
       where: { id: reviewId },
-      select: { reviewerId: true }
+      select: { reviewerId: true, sitterId: true }
     });
 
     if (!review) {
@@ -48,6 +49,17 @@ export async function PUT(
         rating: rating !== undefined ? parseInt(rating.toString()) : undefined,
         comment: comment !== undefined ? comment : undefined,
       }
+    });
+
+    // ─── RabbitMQ: Yorum güncelleme olayını kuyruğa gönder ───
+    // (Toprak Yavuz — Gereksinim 16: Kullanıcı Yorum Güncelleme)
+    // Bu mesaj asenkron işlenir: bakıcıya bildirim, puan güncelleme vb.
+    await publishMessage(QUEUES.REVIEW_UPDATED, {
+      reviewId: updatedReview.id,
+      sitterId: review.sitterId,
+      reviewerId: reviewerId,
+      rating: updatedReview.rating,
+      comment: updatedReview.comment,
     });
 
     return NextResponse.json(updatedReview, { status: 200 });
