@@ -1,5 +1,5 @@
 # PawCarer — Docker Compose
-# Backend + Redis (cache) + RabbitMQ (mesaj kuyruğu) servisleri
+# Backend + Redis (cache) + RabbitMQ (mesaj kuyruğu) + Jenkins (CI/CD) servisleri
 
 services:
   # ─── Backend (Next.js + Prisma) ───
@@ -63,9 +63,23 @@ services:
       - pawcarer-network
     restart: unless-stopped
 
+  # ─── Jenkins (CI/CD) ───
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: pawcarer-jenkins
+    ports:
+      - "8080:8080"   # Web UI
+      - "50000:50000" # Agent bağlantı portu
+    volumes:
+      - jenkins-data:/var/jenkins_home
+    networks:
+      - pawcarer-network
+    restart: unless-stopped
+
 volumes:
   redis-data:
   rabbitmq-data:
+  jenkins-data:
 
 networks:
   pawcarer-network:
