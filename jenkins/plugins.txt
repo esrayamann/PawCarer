@@ -1,0 +1,31 @@
+# ─── PawCarer Jenkins Plugin Listesi ───
+# Bu dosya jenkins-plugin-cli tarafından okunur ve plugin'ler otomatik yüklenir.
+
+# Pipeline (temel)
+workflow-aggregator
+pipeline-stage-view
+
+# Git SCM
+git
+
+# Docker Pipeline (Jenkinsfile'daki docker agent için)
+docker-workflow
+docker-plugin
+
+# Configuration as Code (JCasC)
+configuration-as-code
+
+# NodeJS Tool Installer
+nodejs
+
+# Credentials
+credentials-binding
+
+# Job DSL — JCasC'daki jobs tanımı için gerekli
+job-dsl
+
+# Timestamper — Build loglarına zaman damgası ekler
+timestamper
+
+# Workspace Cleanup
+ws-cleanup

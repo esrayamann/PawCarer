@@ -1,0 +1,62 @@
+# ─── PawCarer Jenkins Configuration as Code (JCasC) ───
+# Jenkins ilk açılışta bu konfigürasyonu otomatik uygular.
+# Dokümantasyon: https://www.jenkins.io/projects/jcasc/
+
+jenkins:
+  systemMessage: "🐾 PawCarer CI/CD — Jenkins Configuration as Code ile yönetilmektedir."
+
+  # Güvenlik Ayarları
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "${JENKINS_ADMIN_USER:-admin}"
+          password: "${JENKINS_ADMIN_PASSWORD:-PawCarer2026!}"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  # Global Araçlar
+  numExecutors: 2
+  mode: NORMAL
+  quietPeriod: 5
+
+# Unclassified Ayarları
+unclassified:
+  location:
+    url: "http://localhost:8080/"
+
+# ─── Pipeline Job Tanımı ───
+jobs:
+  - script: |
+      pipelineJob('PawCarer-Pipeline') {
+        description('🐾 PawCarer CI/CD Pipeline — Otomatik build, test ve deploy')
+
+        // Job ayarları
+        logRotator {
+          numToKeep(10)
+        }
+
+        // SCM Polling — Her 5 dakikada GitHub'ı kontrol et
+        triggers {
+          scm('H/5 * * * *')
+        }
+
+        // Pipeline tanımı — Repo'daki Jenkinsfile'ı kullan
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/esrayamann/PawCarer.git')
+                  credentials('github-credentials')
+                }
+                branches('*/main')
+              }
+            }
+            scriptPath('Jenkinsfile')
+            lightweight(true)
+          }
+        }
+      }

@@ -65,13 +65,27 @@ services:
 
   # ─── Jenkins (CI/CD) ───
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    build:
+      context: ./jenkins
+      dockerfile: Dockerfile
     container_name: pawcarer-jenkins
+    user: root
     ports:
       - "8080:8080"   # Web UI
       - "50000:50000" # Agent bağlantı portu
     volumes:
       - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker-out-of-Docker (DooD)
+    environment:
+      - JENKINS_ADMIN_USER=${JENKINS_ADMIN_USER:-admin}
+      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD:-PawCarer2026!}
+      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc.yaml
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     networks:
       - pawcarer-network
     restart: unless-stopped
