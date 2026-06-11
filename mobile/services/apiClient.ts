@@ -1,7 +1,11 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const BASE_URL = 'https://paw-carer.vercel.app/api';
+// Production (Vercel — RabbitMQ yok):
+// const BASE_URL = 'https://paw-carer.vercel.app/api';
+
+// Local Docker backend (RabbitMQ aktif):
+const BASE_URL = 'http://172.20.10.2:3000/api';
 const TOKEN_KEY = 'pawcarer_jwt';
 
 export const apiClient = axios.create({
