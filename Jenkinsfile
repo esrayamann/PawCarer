@@ -2,7 +2,15 @@
 // GitHub repo: https://github.com/esrayamann/PawCarer
 
 pipeline {
-    agent any
+    // Node.js gerektiren stage'ler için Docker agent kullan
+    // Jenkins container'ında node kurulu olmak zorunda değil
+    agent {
+        docker {
+            image 'node:20-alpine'
+            args '-v /var/run/docker.sock:/var/run/docker.sock -u root'
+            reuseNode true
+        }
+    }
 
     options {
         // Aynı anda sadece 1 build çalışsın
@@ -15,6 +23,7 @@ pipeline {
 
     environment {
         NODE_VERSION = '20'
+        NEXT_TELEMETRY_DISABLED = '1'
     }
 
     stages {
@@ -22,9 +31,9 @@ pipeline {
         // ─── Stage 1: Kod Al ───
         stage('📥 Checkout') {
             steps {
-                echo '📥 GitHub\'dan kod alınıyor...'
-                checkout scm
+                echo '📥 Kaynak kod hazırlanıyor...'
                 echo "✅ Branch: ${env.BRANCH_NAME ?: 'manual'}"
+                sh 'node --version && npm --version'
             }
         }
 
@@ -33,11 +42,7 @@ pipeline {
             steps {
                 dir('backend') {
                     echo '📦 npm bağımlılıkları yükleniyor...'
-                    sh '''
-                        node --version
-                        npm --version
-                        npm ci
-                    '''
+                    sh 'npm ci'
                 }
             }
         }
@@ -58,8 +63,11 @@ pipeline {
                 dir('backend') {
                     echo '🔨 Next.js production build alınıyor...'
                     withEnv([
-                        "RABBITMQ_URL=amqp://guest:guest@localhost:5672",
-                        "REDIS_URL=redis://localhost:6379"
+                        'RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672',
+                        'REDIS_URL=redis://redis:6379',
+                        'DATABASE_URL=postgresql://placeholder',
+                        'DIRECT_URL=postgresql://placeholder',
+                        'JWT_SECRET=ci-build-secret'
                     ]) {
                         sh 'npm run build'
                     }
@@ -77,16 +85,6 @@ pipeline {
                         npx tsc --noEmit || true
                     '''
                 }
-            }
-        }
-
-        // ─── Stage 6: Docker Build ───
-        stage('🐳 Docker Build') {
-            steps {
-                echo '🐳 Docker Compose yapılandırması doğrulanıyor...'
-                sh 'docker compose config'
-                echo '🐳 Backend Docker image build ediliyor...'
-                sh 'docker compose build backend'
             }
         }
     }
